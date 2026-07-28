@@ -5,13 +5,13 @@ import "./App.css";
 import Home from "./pages/Home";
 import ClubMenu from "./pages/ClubMenu";
 import ClubMeasure from "./pages/ClubMeasure";
+
+import RoundMenu from "./pages/RoundMenu";
 import RoundMeasure from "./pages/RoundMeasure";
 import RoundResult from "./pages/RoundResult";
 
-
 function App() {
   const [page, setPage] = useState("home");
-
 
   // クラブ計測入力
   const [club, setClub] = useState("DW");
@@ -19,17 +19,12 @@ function App() {
   const [direction, setDirection] = useState("まっすぐ");
   const [miss, setMiss] = useState("");
 
-
-
-  // クラブ全記録
+  // クラブ計測記録
   const [records, setRecords] = useState(() => {
     const saved = localStorage.getItem("clubRecords");
     return saved ? JSON.parse(saved) : [];
   });
 
-
-
-  // クラブ記録保存
   useEffect(() => {
     localStorage.setItem(
       "clubRecords",
@@ -37,178 +32,74 @@ function App() {
     );
   }, [records]);
 
+  // ラウンド記録
+  const [roundRecords, setRoundRecords] = useState([]);
 
-
-
-
-  // エラー画面
+  // 9. エラー
   if (page === "error") {
-    return (
-      <ErrorPage
-        setPage={setPage}
-      />
-    );
+    return <ErrorPage setPage={setPage} />;
   }
 
-
-
-
-
-  // ホーム
+  // 0. トップ画面
   if (page === "home") {
-    return (
-      <Home
-        setPage={setPage}
-      />
-    );
+    return <Home setPage={setPage} />;
   }
 
-
-
-
-
-  // クラブメニュー
+  // 1. クラブ別計測
   if (page === "club-menu") {
-    return (
-      <ClubMenu
-        setPage={setPage}
-      />
-    );
+    return <ClubMenu setPage={setPage} />;
   }
 
-
-
-
-
-  // クラブ計測
+  // 1-1. クラブ計測
   if (page === "measure") {
     return (
       <ClubMeasure
-
         club={club}
         setClub={setClub}
-
         distance={distance}
         setDistance={setDistance}
-
         direction={direction}
         setDirection={setDirection}
-
         miss={miss}
         setMiss={setMiss}
-
         records={records}
         setRecords={setRecords}
-
         setPage={setPage}
-
       />
     );
   }
 
-
-
-
-
-  // ラウンド計測
+  // 2. ラウンドモード
+  if (page === "round-menu") {
+    return (
+      <RoundMenu
+        setPage={setPage}
+      />
+    );
+  }
+    // 2-1. ラウンド記録
   if (page === "round-measure") {
     return (
       <RoundMeasure
         setPage={setPage}
+        roundRecords={roundRecords}
+        setRoundRecords={setRoundRecords}
       />
     );
   }
 
-
-
-
-
-  // ラウンド結果
+  // 2-2. ラウンド結果
   if (page === "round-result") {
     return (
       <RoundResult
+        roundRecords={roundRecords}
         setPage={setPage}
       />
     );
   }
 
-
-
-
-
-  // ラウンドメニュー
-  if (page === "round-menu") {
-
-    return (
-
-      <div className="container">
-
-
-        <div className="screenTitle">
-          2. ラウンドモード
-        </div>
-
-
-
-        <h1 className="title">
-          🏌️ ラウンドモード
-        </h1>
-
-
-
-
-        <button
-          className="menuButton"
-          onClick={() =>
-            setPage("round-measure")
-          }
-        >
-          計測
-        </button>
-
-
-
-
-        <button
-          className="menuButton"
-          onClick={() =>
-            setPage("round-result")
-          }
-        >
-          結果参照
-        </button>
-
-
-
-
-        <button
-          className="backButton"
-          onClick={() =>
-            setPage("home")
-          }
-        >
-          戻る
-        </button>
-
-
-
-      </div>
-
-    );
-  }
-
-
-
-
-
   // 保険
-  return (
-    <Home
-      setPage={setPage}
-    />
-  );
-
+  return <Home setPage={setPage} />;
 }
-
 
 export default App;

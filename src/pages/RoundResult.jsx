@@ -1,143 +1,96 @@
-import { useEffect, useState } from "react";
-
-function RoundResult({ setPage }) {
-
-  const [records, setRecords] = useState([]);
-
-
-  useEffect(() => {
-
-    const saved =
-      JSON.parse(
-        localStorage.getItem("roundRecords")
-      ) || [];
-
-    setRecords(saved);
-
-  }, []);
-
-
-
-  const totalScore = records.reduce(
-    (sum, item) =>
-      sum + item.score,
-    0
-  );
-
-
-  const totalPutt = records.reduce(
-    (sum, item) =>
-      sum + item.putt,
-    0
-  );
-
-
-
+function RoundResult({ roundRecords, setPage }) {
   return (
-
     <div className="container">
-
-      <h1 className="title">
-        📊 ラウンド結果
-      </h1>
-
-
-      <div className="card">
-
-        <h2>
-          合計 {totalScore} 打
-        </h2>
-
-        <p>
-          パット合計：{totalPutt} 回
-        </p>
-
+      <div className="screenTitle">
+        2-2. ラウンド結果
       </div>
 
+      <h1 className="title">📊 ラウンド結果</h1>
 
+      {roundRecords.length === 0 ? (
+        <p>ラウンドデータがありません。</p>
+      ) : (
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+            textAlign: "center",
+          }}
+        >
+          <thead>
+            <tr>
+              <th>H</th>
+              <th>PAR</th>
+              <th>SC</th>
+              <th>DW</th>
+              <th>FW</th>
+              <th>IR</th>
+              <th>AP</th>
+              <th>PT</th>
+              <th>Pen</th>
+            </tr>
+          </thead>
 
-      {
-        records.length === 0 ? (
+          <tbody>
+            {roundRecords.map((r, index) => {
+              const penalty =
+                r.dwPenalty +
+                r.fwPenalty +
+                r.ironPenalty +
+                r.approachPenalty;
 
-          <div className="card">
-            記録がありません
-          </div>
+              return (
+                <tr
+                  key={index}
+                  style={{
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  <td>{r.hole}</td>
+                  <td>{r.par}</td>
+                  <td>{r.score}</td>
 
-        ) : (
+                  <td>
+                    {r.dwShot}
+                    ({r.dwMiss})
+                  </td>
 
-          records.map(
-            (r,index)=>(
+                  <td>
+                    {r.fwShot}
+                    ({r.fwMiss})
+                  </td>
 
-              <div
-                className="card"
-                key={index}
-              >
+                  <td>
+                    {r.ironShot}
+                    ({r.ironMiss})
+                  </td>
 
-                <h3>
-                  {r.hole}番 PAR{r.par}
-                 　 {r.score}打
-                </h3>
+                  <td>
+                    {r.approachShot}
+                    ({r.approachMiss})
+                  </td>
 
+                  <td>{r.putt}</td>
 
-                <p>
-                  DW：
-                  {r.dwCount}打
-                  （ミス{r.dwMiss}）
-                </p>
+                  <td>{penalty}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
 
-
-                <p>
-                  FW/UT：
-                  {r.fwCount}打
-                  （ミス{r.fwMiss}）
-                </p>
-
-
-                <p>
-                  アイアン：
-                  {r.ironCount}打
-                  （ミス{r.ironMiss}）
-                </p>
-
-
-                <p>
-                  アプローチ：
-                  {r.approachCount}打
-                  （ミス{r.approachMiss}）
-                </p>
-
-
-                <p>
-                  パット：
-                  {r.putt}
-                </p>
-
-
-              </div>
-
-            )
-          )
-
-        )
-      }
-
-
+      <br />
 
       <button
         className="backButton"
-        onClick={() =>
-          setPage("round-menu")
-        }
+        onClick={() => setPage("round-menu")}
       >
         戻る
       </button>
-
-
     </div>
-
   );
-
 }
-
 
 export default RoundResult;

@@ -1,106 +1,74 @@
 import { useState } from "react";
 
-function RoundMeasure({ setPage }) {
+function RoundMeasure({
+  roundRecords,
+  setRoundRecords,
+  setPage,
+}) {
   const [hole, setHole] = useState(1);
   const [par, setPar] = useState(4);
 
-  const [dwCount, setDwCount] = useState(0);
+  const [dwShot, setDwShot] = useState(0);
   const [dwMiss, setDwMiss] = useState(0);
+  const [dwPenalty, setDwPenalty] = useState(0);
 
-  const [fwCount, setFwCount] = useState(0);
+  const [fwShot, setFwShot] = useState(0);
   const [fwMiss, setFwMiss] = useState(0);
+  const [fwPenalty, setFwPenalty] = useState(0);
 
-  const [ironCount, setIronCount] = useState(0);
+  const [ironShot, setIronShot] = useState(0);
   const [ironMiss, setIronMiss] = useState(0);
+  const [ironPenalty, setIronPenalty] = useState(0);
 
-  const [approachCount, setApproachCount] = useState(0);
+  const [approachShot, setApproachShot] = useState(0);
   const [approachMiss, setApproachMiss] = useState(0);
+  const [approachPenalty, setApproachPenalty] = useState(0);
 
-  const [putt, setPutt] = useState(2);
+  const [putt, setPutt] = useState(0);
 
-  const add = (value, setter) => setter(value + 1);
+  const score =
+    dwShot +
+    fwShot +
+    ironShot +
+    approachShot +
+    putt +
+    dwPenalty +
+    fwPenalty +
+    ironPenalty +
+    approachPenalty;
 
-  const sub = (value, setter, min = 0) => {
-    if (value > min) setter(value - 1);
-  };
+  const Counter = ({ label, value, setValue }) => (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "8px",
+      }}
+    >
+      <span>{label}</span>
 
-  const saveRecord = () => {
-    const score =
-      dwCount +
-      fwCount +
-      ironCount +
-      approachCount +
-      putt;
-
-    const record = {
-      hole,
-      par,
-      score,
-      dwCount,
-      dwMiss,
-      fwCount,
-      fwMiss,
-      ironCount,
-      ironMiss,
-      approachCount,
-      approachMiss,
-      putt,
-    };
-
-    const saved =
-      JSON.parse(localStorage.getItem("roundRecords")) || [];
-
-    saved.push(record);
-
-    localStorage.setItem(
-      "roundRecords",
-      JSON.stringify(saved)
-    );
-
-    alert("記録しました");
-  };
-
-  const Counter = ({
-    title,
-    count,
-    setCount,
-    miss,
-    setMiss,
-  }) => (
-    <div className="card">
-      <h3>{title}</h3>
-
-      <div className="counterRow">
-        <span>打数</span>
-
+      <div>
         <button
-          onClick={() => sub(count, setCount)}
+          onClick={() =>
+            setValue(Math.max(0, value - 1))
+          }
         >
           −
         </button>
 
-        <span>{count}</span>
-
-        <button
-          onClick={() => add(count, setCount)}
+        <span
+          style={{
+            display: "inline-block",
+            width: "35px",
+            textAlign: "center",
+          }}
         >
-          ＋
-        </button>
-      </div>
-
-      <div className="counterRow">
-        <span>ミス</span>
+          {value}
+        </span>
 
         <button
-          onClick={() => sub(miss, setMiss)}
-        >
-          −
-        </button>
-
-        <span>{miss}</span>
-
-        <button
-          onClick={() => add(miss, setMiss)}
+          onClick={() => setValue(value + 1)}
         >
           ＋
         </button>
@@ -110,145 +78,202 @@ function RoundMeasure({ setPage }) {
 
   return (
     <div className="container">
+
+      <div className="screenTitle">
+        2-1. ラウンド記録
+      </div>
+
       <h1 className="title">
-        🏌️ ラウンド計測
+        🏌️ ラウンド記録
       </h1>
-
-      <div className="card">
-        <div className="counterRow">
-          <span>Hole</span>
-
-          <button
-            onClick={() =>
-              sub(hole, setHole, 1)
-            }
-          >
-            −
-          </button>
-
-          <span>{hole}</span>
-
-          <button
-            onClick={() =>
-              hole < 18 &&
-              setHole(hole + 1)
-            }
-          >
-            ＋
-          </button>
-        </div>
-
-        <div className="counterRow">
-          <span>PAR</span>
-
-          <button
-            onClick={() =>
-              sub(par, setPar, 3)
-            }
-          >
-            −
-          </button>
-
-          <span>{par}</span>
-
-          <button
-            onClick={() =>
-              par < 5 &&
-              setPar(par + 1)
-            }
-          >
-            ＋
-          </button>
-        </div>
-      </div>
-
-      <Counter
-        title="DW"
-        count={dwCount}
-        setCount={setDwCount}
-        miss={dwMiss}
-        setMiss={setDwMiss}
-      />
-
-      <Counter
-        title="FW / UT"
-        count={fwCount}
-        setCount={setFwCount}
-        miss={fwMiss}
-        setMiss={setFwMiss}
-      />
             <Counter
-        title="アイアン"
-        count={ironCount}
-        setCount={setIronCount}
-        miss={ironMiss}
-        setMiss={setIronMiss}
+        label="Hole"
+        value={hole}
+        setValue={(v) =>
+          setHole(Math.min(18, Math.max(1, v)))
+        }
       />
 
       <Counter
-        title="アプローチ"
-        count={approachCount}
-        setCount={setApproachCount}
-        miss={approachMiss}
-        setMiss={setApproachMiss}
+        label="PAR"
+        value={par}
+        setValue={(v) =>
+          setPar(Math.min(5, Math.max(3, v)))
+        }
       />
 
-      <div className="card">
-        <h3>パット</h3>
+      <hr />
 
-        <div className="counterRow">
-          <button
-            onClick={() =>
-              sub(putt, setPutt)
-            }
-          >
-            −
-          </button>
+      <h3>DW</h3>
 
-          <span>{putt}</span>
+      <Counter
+        label="打数"
+        value={dwShot}
+        setValue={setDwShot}
+      />
 
-          <button
-            onClick={() =>
-              add(putt, setPutt)
-            }
-          >
-            ＋
-          </button>
-        </div>
-      </div>
+      <Counter
+        label="ミス"
+        value={dwMiss}
+        setValue={setDwMiss}
+      />
 
+      <Counter
+        label="ペナルティ"
+        value={dwPenalty}
+        setValue={setDwPenalty}
+      />
 
-      <div className="card">
-        <h3>
-          Score
-        </h3>
+      <hr />
 
-        <h2>
-          {
-            dwCount +
-            fwCount +
-            ironCount +
-            approachCount +
-            putt
-          }
-          打
-        </h2>
-      </div>
+      <h3>FW / UT</h3>
 
+      <Counter
+        label="打数"
+        value={fwShot}
+        setValue={setFwShot}
+      />
+
+      <Counter
+        label="ミス"
+        value={fwMiss}
+        setValue={setFwMiss}
+      />
+
+      <Counter
+        label="ペナルティ"
+        value={fwPenalty}
+        setValue={setFwPenalty}
+      />
+
+      <hr />
+            <h3>アイアン</h3>
+
+      <Counter
+        label="打数"
+        value={ironShot}
+        setValue={setIronShot}
+      />
+
+      <Counter
+        label="ミス"
+        value={ironMiss}
+        setValue={setIronMiss}
+      />
+
+      <Counter
+        label="ペナルティ"
+        value={ironPenalty}
+        setValue={setIronPenalty}
+      />
+
+      <hr />
+
+      <h3>アプローチ</h3>
+
+      <Counter
+        label="打数"
+        value={approachShot}
+        setValue={setApproachShot}
+      />
+
+      <Counter
+        label="ミス"
+        value={approachMiss}
+        setValue={setApproachMiss}
+      />
+
+      <Counter
+        label="ペナルティ"
+        value={approachPenalty}
+        setValue={setApproachPenalty}
+      />
+
+      <hr />
+
+      <h3>パット</h3>
+
+      <Counter
+        label="打数"
+        value={putt}
+        setValue={setPutt}
+      />
+
+      <hr />
+
+      <h2
+        style={{
+          textAlign: "center",
+          marginTop: "20px",
+        }}
+      >
+        スコア　{score}
+      </h2>
+            <br />
 
       <button
         className="menuButton"
-        onClick={saveRecord}
+        onClick={() => {
+          const record = {
+            hole,
+            par,
+            score,
+            dwShot,
+            dwMiss,
+            dwPenalty,
+            fwShot,
+            fwMiss,
+            fwPenalty,
+            ironShot,
+            ironMiss,
+            ironPenalty,
+            approachShot,
+            approachMiss,
+            approachPenalty,
+            putt,
+          };
+
+          setRoundRecords([
+            ...roundRecords,
+            record,
+          ]);
+
+          if (hole >= 18) {
+            setPage("round-result");
+            return;
+          }
+
+          setHole(hole + 1);
+
+          setPar(4);
+
+          setDwShot(0);
+          setDwMiss(0);
+          setDwPenalty(0);
+
+          setFwShot(0);
+          setFwMiss(0);
+          setFwPenalty(0);
+
+          setIronShot(0);
+          setIronMiss(0);
+          setIronPenalty(0);
+
+          setApproachShot(0);
+          setApproachMiss(0);
+          setApproachPenalty(0);
+
+          setPutt(0);
+        }}
       >
         記録する
       </button>
 
-
-      <button
+      <br />
+      <br />
+            <button
         className="backButton"
-        onClick={() =>
-          setPage("round-menu")
-        }
+        onClick={() => setPage("round-menu")}
       >
         戻る
       </button>
