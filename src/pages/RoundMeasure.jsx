@@ -43,32 +43,58 @@ function RoundMeasure({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginBottom: "8px",
+        padding: "10px 0",
       }}
     >
-      <span>{label}</span>
+      <span
+        style={{
+          fontSize: "22px",
+          fontWeight: "bold",
+        }}
+      >
+        {label}
+      </span>
 
-      <div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "18px",
+        }}
+      >
         <button
           onClick={() =>
             setValue(Math.max(0, value - 1))
           }
+          style={{
+            width: "60px",
+            height: "60px",
+            fontSize: "30px",
+            fontWeight: "bold",
+          }}
         >
           −
         </button>
 
-        <span
+        <div
           style={{
-            display: "inline-block",
-            width: "35px",
+            width: "70px",
             textAlign: "center",
+            fontSize: "34px",
+            fontWeight: "bold",
           }}
         >
           {value}
-        </span>
+        </div>
 
         <button
           onClick={() => setValue(value + 1)}
+          style={{
+            width: "60px",
+            height: "60px",
+            fontSize: "30px",
+            fontWeight: "bold",
+          }}
         >
           ＋
         </button>
@@ -78,7 +104,6 @@ function RoundMeasure({
 
   return (
     <div className="container">
-
       <div className="screenTitle">
         2-1. ラウンド記録
       </div>
@@ -86,130 +111,147 @@ function RoundMeasure({
       <h1 className="title">
         🏌️ ラウンド記録
       </h1>
-            <Counter
-        label="Hole"
-        value={hole}
-        setValue={(v) =>
-          setHole(Math.min(18, Math.max(1, v)))
-        }
-      />
 
-      <Counter
-        label="PAR"
-        value={par}
-        setValue={(v) =>
-          setPar(Math.min(5, Math.max(3, v)))
-        }
-      />
+      <div className="card">
+        <Counter
+          label="Hole"
+          value={hole}
+          setValue={(v) =>
+            setHole(Math.min(18, Math.max(1, v)))
+          }
+        />
 
-      <hr />
+        <Counter
+          label="PAR"
+          value={par}
+          setValue={(v) =>
+            setPar(Math.min(5, Math.max(3, v)))
+          }
+        />
+      </div>
 
-      <h3>DW</h3>
+      <div className="card">
+        <h3>🏌️ DW</h3>
 
-      <Counter
-        label="打数"
-        value={dwShot}
-        setValue={setDwShot}
-      />
+        <Counter
+          label="打数"
+          value={dwShot}
+          setValue={setDwShot}
+        />
 
-      <Counter
-        label="ミス"
-        value={dwMiss}
-        setValue={setDwMiss}
-      />
+        <Counter
+          label="ミス"
+          value={dwMiss}
+          setValue={setDwMiss}
+        />
 
-      <Counter
-        label="ペナルティ"
-        value={dwPenalty}
-        setValue={setDwPenalty}
-      />
+        <Counter
+          label="ペナルティ"
+          value={dwPenalty}
+          setValue={setDwPenalty}
+        />
+      </div>
 
-      <hr />
+      <div className="card">
+        <h3>🏌️ FW / UT</h3>
 
-      <h3>FW / UT</h3>
+        <Counter
+          label="打数"
+          value={fwShot}
+          setValue={setFwShot}
+        />
 
-      <Counter
-        label="打数"
-        value={fwShot}
-        setValue={setFwShot}
-      />
+        <Counter
+          label="ミス"
+          value={fwMiss}
+          setValue={setFwMiss}
+        />
 
-      <Counter
-        label="ミス"
-        value={fwMiss}
-        setValue={setFwMiss}
-      />
+        <Counter
+          label="ペナルティ"
+          value={fwPenalty}
+          setValue={setFwPenalty}
+        />
+      </div>
+            <div className="card">
+        <h3>🏌️ アイアン</h3>
 
-      <Counter
-        label="ペナルティ"
-        value={fwPenalty}
-        setValue={setFwPenalty}
-      />
+        <Counter
+          label="打数"
+          value={ironShot}
+          setValue={setIronShot}
+        />
 
-      <hr />
-            <h3>アイアン</h3>
+        <Counter
+          label="ミス"
+          value={ironMiss}
+          setValue={setIronMiss}
+        />
 
-      <Counter
-        label="打数"
-        value={ironShot}
-        setValue={setIronShot}
-      />
+        <Counter
+          label="ペナルティ"
+          value={ironPenalty}
+          setValue={setIronPenalty}
+        />
+      </div>
 
-      <Counter
-        label="ミス"
-        value={ironMiss}
-        setValue={setIronMiss}
-      />
+      <div className="card">
+        <h3>🏌️ アプローチ</h3>
 
-      <Counter
-        label="ペナルティ"
-        value={ironPenalty}
-        setValue={setIronPenalty}
-      />
+        <Counter
+          label="打数"
+          value={approachShot}
+          setValue={setApproachShot}
+        />
 
-      <hr />
+        <Counter
+          label="ミス"
+          value={approachMiss}
+          setValue={setApproachMiss}
+        />
 
-      <h3>アプローチ</h3>
+        <Counter
+          label="ペナルティ"
+          value={approachPenalty}
+          setValue={setApproachPenalty}
+        />
+      </div>
 
-      <Counter
-        label="打数"
-        value={approachShot}
-        setValue={setApproachShot}
-      />
+      <div className="card">
+        <h3>⛳ パット</h3>
 
-      <Counter
-        label="ミス"
-        value={approachMiss}
-        setValue={setApproachMiss}
-      />
+        <Counter
+          label="打数"
+          value={putt}
+          setValue={setPutt}
+        />
+      </div>
 
-      <Counter
-        label="ペナルティ"
-        value={approachPenalty}
-        setValue={setApproachPenalty}
-      />
-
-      <hr />
-
-      <h3>パット</h3>
-
-      <Counter
-        label="打数"
-        value={putt}
-        setValue={setPutt}
-      />
-
-      <hr />
-
-      <h2
+      <div
+        className="card"
         style={{
           textAlign: "center",
-          marginTop: "20px",
         }}
       >
-        スコア　{score}
-      </h2>
-            <br />
+        <div
+          style={{
+            fontSize: "22px",
+            color: "#666",
+          }}
+        >
+          現在スコア
+        </div>
+
+        <div
+          style={{
+            fontSize: "46px",
+            fontWeight: "bold",
+            color: "#2e7d32",
+          }}
+        >
+          {score}
+        </div>
+      </div>
 
       <button
         className="menuButton"
@@ -269,15 +311,12 @@ function RoundMeasure({
         記録する
       </button>
 
-      <br />
-      <br />
-            <button
+      <button
         className="backButton"
         onClick={() => setPage("round-menu")}
       >
         戻る
       </button>
-
     </div>
   );
 }
