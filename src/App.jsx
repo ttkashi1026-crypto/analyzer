@@ -5,6 +5,8 @@ import "./App.css";
 import Home from "./pages/Home";
 import ClubMenu from "./pages/ClubMenu";
 import ClubMeasure from "./pages/ClubMeasure";
+import ClubResult from "./pages/ClubResult";
+import ClubRecordsEdit from "./pages/ClubRecordsEdit";
 
 import RoundMenu from "./pages/RoundMenu";
 import RoundMeasure from "./pages/RoundMeasure";
@@ -81,6 +83,15 @@ function App() {
     );
   }
 
+  if (page === "club-result") {
+    return (
+      <ClubResult
+        records={records}
+        setPage={setPage}
+      />
+    );
+  }
+
   // 2. ラウンドモード
   if (page === "round-menu") {
     return (
@@ -119,6 +130,16 @@ function App() {
       <RoundRecordsEdit
         roundRecords={roundRecords}
         setRoundRecords={setRoundRecords}
+        setPage={setPage}
+      />
+    );
+  }
+
+  if (page === "club-records-edit") {
+    return (
+      <ClubRecordsEdit
+        records={records}
+        setRecords={setRecords}
         setPage={setPage}
       />
     );

@@ -254,6 +254,7 @@ function RoundMeasure({
             fontSize: "46px",
             fontWeight: "bold",
             color: "#2e7d32",
+            marginTop: "8px",
           }}
         >
           {score}

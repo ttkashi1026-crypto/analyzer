@@ -13,6 +13,13 @@ function MaintenanceMenu({ setPage }) {
       </button>
 
       <button
+        className="menuButton"
+        onClick={() => setPage("club-records-edit")}
+      >
+        クラブ別計測データ編集
+      </button>
+
+      <button
         className="backButton"
         onClick={() => setPage("home")}
       >

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
+function ClubRecordsEdit({ records, setRecords, setPage }) {
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const allSelected =
-    roundRecords.length > 0 && selectedIndexes.length === roundRecords.length;
+    records.length > 0 && selectedIndexes.length === records.length;
 
   const toggleRecord = (index) => {
     setSelectedIndexes((current) =>
@@ -14,9 +14,7 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
   };
 
   const toggleAllRecords = () => {
-    setSelectedIndexes(
-      allSelected ? [] : roundRecords.map((_, index) => index),
-    );
+    setSelectedIndexes(allSelected ? [] : records.map((_, index) => index));
   };
 
   const deleteSelectedRecords = () => {
@@ -28,24 +26,22 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
       return;
     }
 
-    setRoundRecords(
-      roundRecords.filter((_, index) => !selectedIndexes.includes(index)),
-    );
+    setRecords(records.filter((_, index) => !selectedIndexes.includes(index)));
     setSelectedIndexes([]);
   };
 
   return (
     <div className="container">
-      <div className="screenTitle">3-1. ラウンド記録データ編集</div>
+      <div className="screenTitle">3-2. クラブ別計測データ編集</div>
 
-      <h1 className="title">ラウンド記録</h1>
+      <h1 className="title">クラブ別計測記録</h1>
 
-      {roundRecords.length === 0 ? (
-        <p>保存されているラウンド記録はありません。</p>
+      {records.length === 0 ? (
+        <p>保存されているクラブ別計測記録はありません。</p>
       ) : (
         <>
           <div style={{ overflowX: "auto" }}>
-            <table style={{ minWidth: "820px", fontSize: "13px" }}>
+            <table style={{ minWidth: "680px", fontSize: "13px" }}>
               <thead>
                 <tr>
                   <th>
@@ -56,37 +52,29 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
                       type="checkbox"
                     />
                   </th>
-                  <th>日付</th>
-                  <th>H</th>
-                  <th>PAR</th>
-                  <th>SC</th>
-                  <th>DW</th>
-                  <th>FW</th>
-                  <th>IR</th>
-                  <th>AP</th>
-                  <th>PT</th>
+                  <th>日時</th>
+                  <th>Club</th>
+                  <th>Dist</th>
+                  <th>Dir</th>
+                  <th>Miss</th>
                 </tr>
               </thead>
               <tbody>
-                {roundRecords.map((record, index) => (
-                  <tr key={`${record.recordedOn || "legacy"}-${record.hole}-${index}`}>
+                {records.map((record, index) => (
+                  <tr key={`${record.datetime}-${index}`}>
                     <td>
                       <input
-                        aria-label={`${record.hole}番ホールの記録を選択`}
+                        aria-label={`${record.datetime}の記録を選択`}
                         checked={selectedIndexes.includes(index)}
                         onChange={() => toggleRecord(index)}
                         type="checkbox"
                       />
                     </td>
-                    <td>{record.recordedOn || "保存前"}</td>
-                    <td>{record.hole}</td>
-                    <td>{record.par}</td>
-                    <td>{record.score}</td>
-                    <td>{record.dwShot}</td>
-                    <td>{record.fwShot}</td>
-                    <td>{record.ironShot}</td>
-                    <td>{record.approachShot}</td>
-                    <td>{record.putt}</td>
+                    <td>{record.datetime}</td>
+                    <td>{record.club}</td>
+                    <td>{record.distance}</td>
+                    <td>{record.direction}</td>
+                    <td>{record.miss}</td>
                   </tr>
                 ))}
               </tbody>
@@ -113,4 +101,4 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
   );
 }
 
-export default RoundRecordsEdit;
+export default ClubRecordsEdit;

@@ -14,7 +14,7 @@ function ClubMenu({ setPage }) {
 
       <button
         className="menuButton"
-        onClick={() => setPage("error")}
+        onClick={() => setPage("club-result")}
       >
         結果参照
       </button>
