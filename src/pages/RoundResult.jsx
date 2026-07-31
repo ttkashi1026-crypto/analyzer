@@ -1,4 +1,37 @@
+import { useState } from "react";
+
 function RoundResult({ roundRecords, setPage }) {
+  const [copyMessage, setCopyMessage] = useState("");
+
+  const copyResults = async () => {
+    const totalPar = roundRecords.reduce((total, record) => total + record.par, 0);
+    const totalScore = roundRecords.reduce(
+      (total, record) => total + record.score,
+      0,
+    );
+
+    const resultText = [
+      "ラウンド結果",
+      ...roundRecords.map((record) => {
+        const penalty =
+          record.dwPenalty +
+          record.fwPenalty +
+          record.ironPenalty +
+          record.approachPenalty;
+
+        return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DW ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
+      }),
+      `合計  PAR ${totalPar}  SCORE ${totalScore}  (${totalScore - totalPar >= 0 ? "+" : ""}${totalScore - totalPar})`,
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(resultText);
+      setCopyMessage("コピーしました");
+    } catch {
+      setCopyMessage("コピーに失敗しました");
+    }
+  };
+
   return (
     <div className="container">
       <div className="screenTitle">
@@ -79,6 +112,17 @@ function RoundResult({ roundRecords, setPage }) {
             })}
           </tbody>
         </table>
+      )}
+
+      {roundRecords.length > 0 && (
+        <>
+          <button className="menuButton" onClick={copyResults}>
+            結果をコピー
+          </button>
+          {copyMessage && (
+            <p style={{ textAlign: "center" }}>{copyMessage}</p>
+          )}
+        </>
       )}
 
       <br />
