@@ -18,6 +18,13 @@ function Home({ setPage }) {
       >
         ラウンドモード記録
       </button>
+
+      <button
+        className="menuButton"
+        onClick={() => setPage("maintenance-menu")}
+      >
+        メンテナンス
+      </button>
     </div>
   );
 }

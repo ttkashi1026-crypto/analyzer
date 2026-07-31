@@ -1,18 +1,48 @@
 import { useState } from "react";
 
+const toDateKey = (date = new Date()) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+
+const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
+
 function RoundResult({ roundRecords, setPage }) {
   const [copyMessage, setCopyMessage] = useState("");
+  const [selectedDate, setSelectedDate] = useState(toDateKey);
+  const recordsForDate = roundRecords.filter(
+    (record) => (record.recordedOn || toDateKey()) === selectedDate,
+  );
+
+  const changeDate = (days) => {
+    const [year, month, day] = selectedDate.split("-").map(Number);
+    const nextDate = new Date(year, month - 1, day);
+    nextDate.setDate(nextDate.getDate() + days);
+    setSelectedDate(toDateKey(nextDate));
+    setCopyMessage("");
+  };
 
   const copyResults = async () => {
-    const totalPar = roundRecords.reduce((total, record) => total + record.par, 0);
-    const totalScore = roundRecords.reduce(
+    const copiedAt = new Date();
+    const copyDateTime = `${copiedAt.getFullYear()}/${String(
+      copiedAt.getMonth() + 1,
+    ).padStart(2, "0")}/${String(copiedAt.getDate()).padStart(2, "0")} ${String(
+      copiedAt.getHours(),
+    ).padStart(2, "0")}:${String(copiedAt.getMinutes()).padStart(2, "0")}`;
+    const totalPar = recordsForDate.reduce(
+      (total, record) => total + record.par,
+      0,
+    );
+    const totalScore = recordsForDate.reduce(
       (total, record) => total + record.score,
       0,
     );
 
     const resultText = [
       "ラウンド結果",
-      ...roundRecords.map((record) => {
+      `記録日: ${formatDate(selectedDate)}`,
+      `コピー日時: ${copyDateTime}`,
+      ...recordsForDate.map((record) => {
         const penalty =
           record.dwPenalty +
           record.fwPenalty +
@@ -40,7 +70,30 @@ function RoundResult({ roundRecords, setPage }) {
 
       <h1 className="title">📊 ラウンド結果</h1>
 
-      {roundRecords.length === 0 ? (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          margin: "16px 0",
+        }}
+      >
+        <button
+          aria-label="前日を表示"
+          onClick={() => changeDate(-1)}
+        >
+          ←
+        </button>
+        <strong>{formatDate(selectedDate)}</strong>
+        <button
+          aria-label="翌日を表示"
+          onClick={() => changeDate(1)}
+        >
+          →
+        </button>
+      </div>
+
+      {recordsForDate.length === 0 ? (
         <p>ラウンドデータがありません。</p>
       ) : (
         <table
@@ -66,7 +119,7 @@ function RoundResult({ roundRecords, setPage }) {
           </thead>
 
           <tbody>
-            {roundRecords.map((r, index) => {
+            {recordsForDate.map((r, index) => {
               const penalty =
                 r.dwPenalty +
                 r.fwPenalty +
@@ -114,7 +167,7 @@ function RoundResult({ roundRecords, setPage }) {
         </table>
       )}
 
-      {roundRecords.length > 0 && (
+      {recordsForDate.length > 0 && (
         <>
           <button className="menuButton" onClick={copyResults}>
             結果をコピー

@@ -9,6 +9,8 @@ import ClubMeasure from "./pages/ClubMeasure";
 import RoundMenu from "./pages/RoundMenu";
 import RoundMeasure from "./pages/RoundMeasure";
 import RoundResult from "./pages/RoundResult";
+import MaintenanceMenu from "./pages/MaintenanceMenu";
+import RoundRecordsEdit from "./pages/RoundRecordsEdit";
 
 function App() {
   const [page, setPage] = useState("home");
@@ -33,7 +35,17 @@ function App() {
   }, [records]);
 
   // ラウンド記録
-  const [roundRecords, setRoundRecords] = useState([]);
+  const [roundRecords, setRoundRecords] = useState(() => {
+    const saved = localStorage.getItem("roundRecords");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "roundRecords",
+      JSON.stringify(roundRecords),
+    );
+  }, [roundRecords]);
 
   // 9. エラー
   if (page === "error") {
@@ -93,6 +105,20 @@ function App() {
     return (
       <RoundResult
         roundRecords={roundRecords}
+        setPage={setPage}
+      />
+    );
+  }
+
+  if (page === "maintenance-menu") {
+    return <MaintenanceMenu setPage={setPage} />;
+  }
+
+  if (page === "round-records-edit") {
+    return (
+      <RoundRecordsEdit
+        roundRecords={roundRecords}
+        setRoundRecords={setRoundRecords}
         setPage={setPage}
       />
     );
