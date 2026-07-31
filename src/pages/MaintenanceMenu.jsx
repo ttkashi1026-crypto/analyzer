@@ -7,16 +7,16 @@ function MaintenanceMenu({ setPage }) {
 
       <button
         className="menuButton"
-        onClick={() => setPage("round-records-edit")}
+        onClick={() => setPage("club-records-edit")}
       >
-        ラウンド記録データ編集
+        クラブ別計測データ編集
       </button>
 
       <button
         className="menuButton"
-        onClick={() => setPage("club-records-edit")}
+        onClick={() => setPage("round-records-edit")}
       >
-        クラブ別計測データ編集
+        ラウンド記録データ編集
       </button>
 
       <button
