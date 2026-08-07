@@ -63,7 +63,7 @@ function ClubMeasure({
       </section>
 
       <section className="measurementRow" aria-label="ショット記録">
-        <label className="compactField">
+        <label className="compactField numericField">
           <span className="compactLabel">飛距離</span>
           <input
             className="inputBox"
@@ -91,7 +91,7 @@ function ClubMeasure({
           </div>
         </div>
 
-        <label className="compactField">
+        <label className="compactField numericField">
           <span className="compactLabel">ミス量</span>
           <input
             className="inputBox"
