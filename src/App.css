@@ -213,7 +213,14 @@ tr:nth-child(even) {
 }
 
 .clubMeasure .numericField {
+  display: flex;
+  align-items: center;
   flex: 0 0 auto;
+  gap: 6px;
+}
+
+.clubMeasure .numericField .compactLabel {
+  margin: 0;
 }
 
 .clubMeasure .inputBox {
@@ -228,6 +235,7 @@ tr:nth-child(even) {
 
 .clubMeasure .numericField .inputBox {
   width: 5.5em;
+  margin: 0;
 }
 
 .directionField {

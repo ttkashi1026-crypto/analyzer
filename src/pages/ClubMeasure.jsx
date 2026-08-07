@@ -75,6 +75,18 @@ function ClubMeasure({
           />
         </label>
 
+        <label className="compactField numericField">
+          <span className="compactLabel">ミス量</span>
+          <input
+            className="inputBox"
+            type="number"
+            inputMode="numeric"
+            value={miss}
+            onChange={(e) => setMiss(e.target.value)}
+            aria-label="ミス量"
+          />
+        </label>
+
         <div className="compactField directionField">
           <span className="compactLabel">方向</span>
           <div className="directionButtons" role="group" aria-label="方向">
@@ -90,18 +102,6 @@ function ClubMeasure({
             ))}
           </div>
         </div>
-
-        <label className="compactField numericField">
-          <span className="compactLabel">ミス量</span>
-          <input
-            className="inputBox"
-            type="number"
-            inputMode="numeric"
-            value={miss}
-            onChange={(e) => setMiss(e.target.value)}
-            aria-label="ミス量"
-          />
-        </label>
 
         <button className="menuButton saveButton" onClick={saveRecord}>
           記録する
