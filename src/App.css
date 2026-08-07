@@ -140,3 +140,18 @@ td {
 tr:nth-child(even) {
   background: #f8f8f8;
 }
+
+.roundMeasure .title {
+  font-size: clamp(28px, 7vw, 36px);
+  margin: 6px 0 12px;
+}
+
+.roundMeasure .card {
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.roundMeasure h3 {
+  font-size: 19px;
+  margin-bottom: 6px;
+}

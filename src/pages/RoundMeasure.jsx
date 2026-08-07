@@ -50,12 +50,12 @@ function RoundMeasure({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "10px 0",
+        padding: "6px 0",
       }}
     >
       <span
         style={{
-          fontSize: "22px",
+          fontSize: "18px",
           fontWeight: "bold",
         }}
       >
@@ -66,7 +66,7 @@ function RoundMeasure({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "18px",
+          gap: "12px",
         }}
       >
         <button
@@ -74,9 +74,9 @@ function RoundMeasure({
             setValue(Math.max(0, value - 1))
           }
           style={{
-            width: "60px",
-            height: "60px",
-            fontSize: "30px",
+            width: "48px",
+            height: "48px",
+            fontSize: "26px",
             fontWeight: "bold",
           }}
         >
@@ -85,9 +85,9 @@ function RoundMeasure({
 
         <div
           style={{
-            width: "70px",
+            width: "56px",
             textAlign: "center",
-            fontSize: "34px",
+            fontSize: "28px",
             fontWeight: "bold",
           }}
         >
@@ -97,9 +97,9 @@ function RoundMeasure({
         <button
           onClick={() => setValue(value + 1)}
           style={{
-            width: "60px",
-            height: "60px",
-            fontSize: "30px",
+            width: "48px",
+            height: "48px",
+            fontSize: "26px",
             fontWeight: "bold",
           }}
         >
@@ -110,7 +110,7 @@ function RoundMeasure({
   );
 
   return (
-    <div className="container">
+    <div className="container roundMeasure">
       <div className="screenTitle">
         2-1. ラウンド記録
       </div>
