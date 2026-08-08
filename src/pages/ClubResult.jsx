@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const toDateKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
@@ -6,6 +6,15 @@ const toDateKey = (date = new Date()) =>
   ).padStart(2, "0")}`;
 
 const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
+
+const getRecordDate = (record) => {
+  if (record.recordedOn) return record.recordedOn;
+
+  const [month, day] = record.datetime?.split(" ")[0]?.split("/") || [];
+  return month && day
+    ? `${new Date().getFullYear()}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`
+    : null;
+};
 
 const isRecordForDate = (record, dateKey) => {
   if (record.recordedOn) {
@@ -17,16 +26,27 @@ const isRecordForDate = (record, dateKey) => {
 };
 
 function ClubResult({ records, setPage }) {
-  const [selectedDate, setSelectedDate] = useState(toDateKey);
+  const availableDates = useMemo(
+    () => [...new Set(records.map(getRecordDate).filter(Boolean))].sort(),
+    [records],
+  );
+  const [selectedDate, setSelectedDate] = useState(
+    () => availableDates.at(-1) || toDateKey(),
+  );
   const recordsForDate = records.filter((record) =>
     isRecordForDate(record, selectedDate),
   );
+  const selectedDateIndex = availableDates.indexOf(selectedDate);
 
-  const changeDate = (days) => {
-    const [year, month, day] = selectedDate.split("-").map(Number);
-    const nextDate = new Date(year, month - 1, day);
-    nextDate.setDate(nextDate.getDate() + days);
-    setSelectedDate(toDateKey(nextDate));
+  useEffect(() => {
+    if (availableDates.length > 0 && selectedDateIndex === -1) {
+      setSelectedDate(availableDates.at(-1));
+    }
+  }, [availableDates, selectedDateIndex]);
+
+  const changeDate = (offset) => {
+    const nextDate = availableDates[selectedDateIndex + offset];
+    if (nextDate) setSelectedDate(nextDate);
   };
 
   return (
@@ -43,11 +63,22 @@ function ClubResult({ records, setPage }) {
           margin: "16px 0",
         }}
       >
-        <button aria-label="前日を表示" onClick={() => changeDate(-1)}>
+        <button
+          aria-label="前の記録日を表示"
+          onClick={() => changeDate(-1)}
+          disabled={selectedDateIndex <= 0}
+        >
           ←
         </button>
         <strong>{formatDate(selectedDate)}</strong>
-        <button aria-label="翌日を表示" onClick={() => changeDate(1)}>
+        <button
+          aria-label="次の記録日を表示"
+          onClick={() => changeDate(1)}
+          disabled={
+            selectedDateIndex === -1 ||
+            selectedDateIndex >= availableDates.length - 1
+          }
+        >
           →
         </button>
       </div>

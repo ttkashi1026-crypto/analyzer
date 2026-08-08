@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 function ClubMeasure({
   club,
   setClub,
@@ -11,8 +13,13 @@ function ClubMeasure({
   setRecords,
   setPage,
 }) {
+  const [hiddenRecords, setHiddenRecords] = useState(() => new Set());
+  const [copyMessage, setCopyMessage] = useState("");
   const clubs = ["DW", "FW", "UT", "7I", "PW"];
   const directions = ["左", "まっすぐ", "右"];
+  const recentRecords = records
+    .filter((record) => !hiddenRecords.has(record))
+    .slice(0, 5);
 
   const saveRecord = () => {
     const now = new Date();
@@ -40,6 +47,34 @@ function ClubMeasure({
     ]);
     setDistance("");
     setMiss("");
+    setCopyMessage("");
+  };
+
+  const hideDisplayedRecords = () => {
+    setHiddenRecords(new Set(records));
+    setCopyMessage("");
+  };
+
+  const copyRecentRecords = async () => {
+    const text = [
+      "日時\tClub\t距離\t方向\tミス",
+      ...recentRecords.map((record) =>
+        [
+          record.datetime,
+          record.club,
+          record.distance,
+          record.direction,
+          record.miss,
+        ].join("\t"),
+      ),
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyMessage("コピーしました");
+    } catch {
+      setCopyMessage("コピーに失敗しました");
+    }
   };
 
   return (
@@ -109,7 +144,17 @@ function ClubMeasure({
       </section>
 
       <section className="recentRecords">
-        <h3>最新記録</h3>
+        <div className="recentRecordsHeader">
+          <h3>最新記録</h3>
+          <button
+            className="recentRecordsToggle"
+            onClick={hideDisplayedRecords}
+            disabled={recentRecords.length === 0}
+          >
+            画面表示から消す
+          </button>
+        </div>
+
         <div className="tableWrap">
           <table>
             <thead>
@@ -122,7 +167,7 @@ function ClubMeasure({
               </tr>
             </thead>
             <tbody>
-              {records.slice(0, 5).map((record, index) => (
+              {recentRecords.map((record, index) => (
                 <tr key={`${record.datetime}-${index}`}>
                   <td>{record.datetime}</td>
                   <td>{record.club}</td>
@@ -134,6 +179,14 @@ function ClubMeasure({
             </tbody>
           </table>
         </div>
+        <button
+          className="copyRecentRecordsButton"
+          onClick={copyRecentRecords}
+          disabled={recentRecords.length === 0}
+        >
+          画面表示内容をコピー
+        </button>
+        {copyMessage && <span className="copyMessage">{copyMessage}</span>}
       </section>
 
       <button className="backButton" onClick={() => setPage("club-menu")}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const toDateKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
@@ -7,18 +7,65 @@ const toDateKey = (date = new Date()) =>
 
 const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
 
+const clubDefinitions = [
+  { label: "DW", shotKey: "dwShot", missKey: "dwMiss" },
+  { label: "FW / UT", shotKey: "fwShot", missKey: "fwMiss" },
+  { label: "アイアン", shotKey: "ironShot", missKey: "ironMiss" },
+  { label: "アプローチ", shotKey: "approachShot", missKey: "approachMiss" },
+];
+
+const getClubStats = (records) =>
+  clubDefinitions.map(({ label, shotKey, missKey }) => {
+    const shots = records.reduce(
+      (total, record) => total + (Number(record[shotKey]) || 0),
+      0,
+    );
+    const misses = records.reduce(
+      (total, record) => total + (Number(record[missKey]) || 0),
+      0,
+    );
+    const successes = Math.max(0, shots - misses);
+
+    return {
+      label,
+      shots,
+      successes,
+      rate: shots > 0 ? Math.round((successes / shots) * 100) : null,
+    };
+  });
+
 function RoundResult({ roundRecords, setPage }) {
   const [copyMessage, setCopyMessage] = useState("");
-  const [selectedDate, setSelectedDate] = useState(toDateKey);
+  const availableDates = useMemo(
+    () => [
+      ...new Set(
+        roundRecords.map((record) => record.recordedOn || toDateKey()),
+      ),
+    ].sort(),
+    [roundRecords],
+  );
+  const [selectedDate, setSelectedDate] = useState(
+    () => availableDates.at(-1) || toDateKey(),
+  );
   const recordsForDate = roundRecords.filter(
     (record) => (record.recordedOn || toDateKey()) === selectedDate,
   );
+  const grossScore = recordsForDate.reduce(
+    (total, record) => total + (Number(record.score) || 0),
+    0,
+  );
+  const clubStats = getClubStats(recordsForDate);
+  const selectedDateIndex = availableDates.indexOf(selectedDate);
 
-  const changeDate = (days) => {
-    const [year, month, day] = selectedDate.split("-").map(Number);
-    const nextDate = new Date(year, month - 1, day);
-    nextDate.setDate(nextDate.getDate() + days);
-    setSelectedDate(toDateKey(nextDate));
+  useEffect(() => {
+    if (availableDates.length > 0 && selectedDateIndex === -1) {
+      setSelectedDate(availableDates.at(-1));
+    }
+  }, [availableDates, selectedDateIndex]);
+
+  const changeDate = (offset) => {
+    const nextDate = availableDates[selectedDateIndex + offset];
+    if (nextDate) setSelectedDate(nextDate);
     setCopyMessage("");
   };
 
@@ -33,15 +80,17 @@ function RoundResult({ roundRecords, setPage }) {
       (total, record) => total + record.par,
       0,
     );
-    const totalScore = recordsForDate.reduce(
-      (total, record) => total + record.score,
-      0,
-    );
 
     const resultText = [
       "ラウンド結果",
       `記録日: ${formatDate(selectedDate)}`,
       `コピー日時: ${copyDateTime}`,
+      `グロススコア: ${grossScore}`,
+      "クラブ別成功率",
+      ...clubStats.map(
+        ({ label, successes, shots, rate }) =>
+          `${label}: ${rate === null ? "—" : `${rate}%`} (${successes}/${shots})`,
+      ),
       ...recordsForDate.map((record) => {
         const penalty =
           record.dwPenalty +
@@ -51,7 +100,7 @@ function RoundResult({ roundRecords, setPage }) {
 
         return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DW ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
       }),
-      `合計  PAR ${totalPar}  SCORE ${totalScore}  (${totalScore - totalPar >= 0 ? "+" : ""}${totalScore - totalPar})`,
+      `合計  PAR ${totalPar}  SCORE ${grossScore}  (${grossScore - totalPar >= 0 ? "+" : ""}${grossScore - totalPar})`,
     ].join("\n");
 
     try {
@@ -79,15 +128,20 @@ function RoundResult({ roundRecords, setPage }) {
         }}
       >
         <button
-          aria-label="前日を表示"
+          aria-label="前の記録日を表示"
           onClick={() => changeDate(-1)}
+          disabled={selectedDateIndex <= 0}
         >
           ←
         </button>
         <strong>{formatDate(selectedDate)}</strong>
         <button
-          aria-label="翌日を表示"
+          aria-label="次の記録日を表示"
           onClick={() => changeDate(1)}
+          disabled={
+            selectedDateIndex === -1 ||
+            selectedDateIndex >= availableDates.length - 1
+          }
         >
           →
         </button>
@@ -96,14 +150,37 @@ function RoundResult({ roundRecords, setPage }) {
       {recordsForDate.length === 0 ? (
         <p>ラウンドデータがありません。</p>
       ) : (
-        <table
+        <>
+          <section className="roundSummary" aria-label="ラウンド集計">
+            <div className="grossScoreCard">
+              <span>グロススコア</span>
+              <strong>{grossScore}</strong>
+            </div>
+
+            <div className="clubSuccessSummary">
+              <h2>クラブ別成功率</h2>
+              <div className="clubSuccessGrid">
+                {clubStats.map(({ label, successes, shots, rate }) => (
+                  <div className="clubSuccessCard" key={label}>
+                    <span>{label}</span>
+                    <strong>{rate === null ? "—" : `${rate}%`}</strong>
+                    <small>
+                      {successes} / {shots}
+                    </small>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <table
           style={{
             width: "100%",
             borderCollapse: "collapse",
             fontSize: "13px",
             textAlign: "center",
           }}
-        >
+          >
           <thead>
             <tr>
               <th>H</th>
@@ -164,7 +241,8 @@ function RoundResult({ roundRecords, setPage }) {
               );
             })}
           </tbody>
-        </table>
+          </table>
+        </>
       )}
 
       {recordsForDate.length > 0 && (
