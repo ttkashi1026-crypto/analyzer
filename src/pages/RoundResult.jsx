@@ -34,7 +34,7 @@ const getClubStats = (records) =>
     };
   });
 
-function RoundResult({ roundRecords, setPage }) {
+function RoundResult({ roundRecords, setPage, onEditRecord }) {
   const [copyMessage, setCopyMessage] = useState("");
   const availableDates = useMemo(
     () => [
@@ -50,6 +50,12 @@ function RoundResult({ roundRecords, setPage }) {
   const recordsForDate = roundRecords.filter(
     (record) => (record.recordedOn || toDateKey()) === selectedDate,
   );
+  const recordEntriesForDate = roundRecords
+    .map((record, originalIndex) => ({ record, originalIndex }))
+    .filter(
+      ({ record }) =>
+        (record.recordedOn || toDateKey()) === selectedDate,
+    );
   const grossScore = recordsForDate.reduce(
     (total, record) => total + (Number(record.score) || 0),
     0,
@@ -192,11 +198,12 @@ function RoundResult({ roundRecords, setPage }) {
               <th>AP</th>
               <th>PT</th>
               <th>Pen</th>
+              <th>修正</th>
             </tr>
           </thead>
 
           <tbody>
-            {recordsForDate.map((r, index) => {
+            {recordEntriesForDate.map(({ record: r, originalIndex }) => {
               const penalty =
                 r.dwPenalty +
                 r.fwPenalty +
@@ -205,7 +212,7 @@ function RoundResult({ roundRecords, setPage }) {
 
               return (
                 <tr
-                  key={index}
+                  key={`${selectedDate}-${r.hole}-${originalIndex}`}
                   style={{
                     borderBottom: "1px solid #ddd",
                   }}
@@ -237,6 +244,15 @@ function RoundResult({ roundRecords, setPage }) {
                   <td>{r.putt}</td>
 
                   <td>{penalty}</td>
+                  <td>
+                    <button
+                      className="roundEditButton"
+                      aria-label={`${r.hole}番ホールの記録を修正`}
+                      onClick={() => onEditRecord(originalIndex)}
+                    >
+                      編集
+                    </button>
+                  </td>
                 </tr>
               );
             })}

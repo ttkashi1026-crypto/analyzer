@@ -16,6 +16,7 @@ import RoundRecordsEdit from "./pages/RoundRecordsEdit";
 
 function App() {
   const [page, setPage] = useState("home");
+  const [editingRoundIndex, setEditingRoundIndex] = useState(null);
 
   // クラブ計測入力
   const [club, setClub] = useState("DW");
@@ -107,6 +108,8 @@ function App() {
         setPage={setPage}
         roundRecords={roundRecords}
         setRoundRecords={setRoundRecords}
+        editingIndex={editingRoundIndex}
+        onFinishEditing={() => setEditingRoundIndex(null)}
       />
     );
   }
@@ -117,6 +120,10 @@ function App() {
       <RoundResult
         roundRecords={roundRecords}
         setPage={setPage}
+        onEditRecord={(index) => {
+          setEditingRoundIndex(index);
+          setPage("round-measure");
+        }}
       />
     );
   }

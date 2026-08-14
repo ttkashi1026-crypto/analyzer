@@ -11,27 +11,34 @@ function RoundMeasure({
   roundRecords,
   setRoundRecords,
   setPage,
+  editingIndex = null,
+  onFinishEditing,
 }) {
-  const [hole, setHole] = useState(1);
-  const [par, setPar] = useState(4);
+  const editingRecord =
+    editingIndex === null ? null : roundRecords[editingIndex];
+  const initialValue = (key, fallback = 0) =>
+    Number(editingRecord?.[key] ?? fallback);
 
-  const [dwShot, setDwShot] = useState(0);
-  const [dwMiss, setDwMiss] = useState(0);
-  const [dwPenalty, setDwPenalty] = useState(0);
+  const [hole, setHole] = useState(() => initialValue("hole", 1));
+  const [par, setPar] = useState(() => initialValue("par", 4));
 
-  const [fwShot, setFwShot] = useState(0);
-  const [fwMiss, setFwMiss] = useState(0);
-  const [fwPenalty, setFwPenalty] = useState(0);
+  const [dwShot, setDwShot] = useState(() => initialValue("dwShot"));
+  const [dwMiss, setDwMiss] = useState(() => initialValue("dwMiss"));
+  const [dwPenalty, setDwPenalty] = useState(() => initialValue("dwPenalty"));
 
-  const [ironShot, setIronShot] = useState(0);
-  const [ironMiss, setIronMiss] = useState(0);
-  const [ironPenalty, setIronPenalty] = useState(0);
+  const [fwShot, setFwShot] = useState(() => initialValue("fwShot"));
+  const [fwMiss, setFwMiss] = useState(() => initialValue("fwMiss"));
+  const [fwPenalty, setFwPenalty] = useState(() => initialValue("fwPenalty"));
 
-  const [approachShot, setApproachShot] = useState(0);
-  const [approachMiss, setApproachMiss] = useState(0);
-  const [approachPenalty, setApproachPenalty] = useState(0);
+  const [ironShot, setIronShot] = useState(() => initialValue("ironShot"));
+  const [ironMiss, setIronMiss] = useState(() => initialValue("ironMiss"));
+  const [ironPenalty, setIronPenalty] = useState(() => initialValue("ironPenalty"));
 
-  const [putt, setPutt] = useState(0);
+  const [approachShot, setApproachShot] = useState(() => initialValue("approachShot"));
+  const [approachMiss, setApproachMiss] = useState(() => initialValue("approachMiss"));
+  const [approachPenalty, setApproachPenalty] = useState(() => initialValue("approachPenalty"));
+
+  const [putt, setPutt] = useState(() => initialValue("putt"));
 
   const score =
     dwShot +
@@ -112,11 +119,11 @@ function RoundMeasure({
   return (
     <div className="container roundMeasure">
       <div className="screenTitle">
-        2-1. ラウンド記録
+        {editingRecord ? "2-1. ラウンド記録修正" : "2-1. ラウンド記録"}
       </div>
 
       <h1 className="title">
-        🏌️ ラウンド記録
+        {editingRecord ? `✏️ ${hole}Hの記録修正` : "🏌️ ラウンド記録"}
       </h1>
 
       <div className="card">
@@ -265,7 +272,7 @@ function RoundMeasure({
         className="menuButton"
         onClick={() => {
           const record = {
-            recordedOn: getDateKey(),
+            recordedOn: editingRecord?.recordedOn || getDateKey(),
             hole,
             par,
             score,
@@ -284,10 +291,18 @@ function RoundMeasure({
             putt,
           };
 
-          setRoundRecords([
-            ...roundRecords,
-            record,
-          ]);
+          if (editingRecord) {
+            setRoundRecords(
+              roundRecords.map((current, index) =>
+                index === editingIndex ? record : current,
+              ),
+            );
+            onFinishEditing?.();
+            setPage("round-result");
+            return;
+          }
+
+          setRoundRecords([...roundRecords, record]);
 
           if (hole >= 18) {
             setPage("round-result");
@@ -317,14 +332,21 @@ function RoundMeasure({
           setPutt(0);
         }}
       >
-        記録する
+        {editingRecord ? "変更を保存" : "記録する"}
       </button>
 
       <button
         className="backButton"
-        onClick={() => setPage("round-menu")}
+        onClick={() => {
+          if (editingRecord) {
+            onFinishEditing?.();
+            setPage("round-result");
+            return;
+          }
+          setPage("round-menu");
+        }}
       >
-        戻る
+        {editingRecord ? "キャンセル" : "戻る"}
       </button>
     </div>
   );
