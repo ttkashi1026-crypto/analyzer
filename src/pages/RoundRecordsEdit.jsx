@@ -60,7 +60,7 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
                   <th>H</th>
                   <th>PAR</th>
                   <th>SC</th>
-                  <th>DW</th>
+                  <th>DR</th>
                   <th>FW</th>
                   <th>IR</th>
                   <th>AP</th>

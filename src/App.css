@@ -241,6 +241,7 @@ tr:nth-child(even) {
 .measurementRow {
   display: flex;
   align-items: end;
+  flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -318,6 +319,24 @@ tr:nth-child(even) {
   flex: 1;
 }
 
+.missTypeField {
+  flex: 1 0 100%;
+  order: 1;
+}
+
+.missTypeButtons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.missTypeButtons .directionButton {
+  width: 100%;
+  padding: 0 6px;
+  font-size: 14px;
+}
+
 .clubMeasure .saveButton {
   width: auto;
   height: 40px;
@@ -370,7 +389,7 @@ tr:nth-child(even) {
 
 .clubMeasure table {
   width: 100%;
-  min-width: 0;
+  min-width: 650px;
   table-layout: fixed;
   font-size: 13px;
 }
@@ -409,6 +428,10 @@ tr:nth-child(even) {
 
   .directionField {
     flex-basis: 100%;
+  }
+
+  .missTypeButtons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .clubMeasure .saveButton {

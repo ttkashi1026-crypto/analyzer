@@ -56,7 +56,8 @@ function ClubRecordsEdit({ records, setRecords, setPage }) {
                   <th>Club</th>
                   <th>Dist</th>
                   <th>Dir</th>
-                  <th>Miss</th>
+                  <th>左右ずれ幅</th>
+                  <th>ミスの種類</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,10 +72,11 @@ function ClubRecordsEdit({ records, setRecords, setPage }) {
                       />
                     </td>
                     <td>{record.datetime}</td>
-                    <td>{record.club}</td>
+                    <td>{record.club === "DW" ? "DR" : record.club}</td>
                     <td>{record.distance}</td>
                     <td>{record.direction}</td>
                     <td>{record.miss}</td>
+                    <td>{record.missType}</td>
                   </tr>
                 ))}
               </tbody>

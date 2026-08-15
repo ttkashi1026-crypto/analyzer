@@ -8,7 +8,7 @@ const toDateKey = (date = new Date()) =>
 const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
 
 const clubDefinitions = [
-  { label: "DW", shotKey: "dwShot", missKey: "dwMiss" },
+  { label: "DR", shotKey: "dwShot", missKey: "dwMiss" },
   { label: "FW / UT", shotKey: "fwShot", missKey: "fwMiss" },
   { label: "アイアン", shotKey: "ironShot", missKey: "ironMiss" },
   { label: "アプローチ", shotKey: "approachShot", missKey: "approachMiss" },
@@ -104,7 +104,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
           record.ironPenalty +
           record.approachPenalty;
 
-        return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DW ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
+        return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DR ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
       }),
       `合計  PAR ${totalPar}  SCORE ${grossScore}  (${grossScore - totalPar >= 0 ? "+" : ""}${grossScore - totalPar})`,
     ].join("\n");
@@ -192,7 +192,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
               <th>H</th>
               <th>PAR</th>
               <th>SC</th>
-              <th>DW</th>
+              <th>DR</th>
               <th>FW</th>
               <th>IR</th>
               <th>AP</th>

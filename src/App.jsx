@@ -19,10 +19,11 @@ function App() {
   const [editingRoundIndex, setEditingRoundIndex] = useState(null);
 
   // クラブ計測入力
-  const [club, setClub] = useState("DW");
+  const [club, setClub] = useState("DR");
   const [distance, setDistance] = useState("");
   const [direction, setDirection] = useState("まっすぐ");
   const [miss, setMiss] = useState("");
+  const [missType, setMissType] = useState("");
 
   // クラブ計測記録
   const [records, setRecords] = useState(() => {
@@ -77,6 +78,8 @@ function App() {
         setDirection={setDirection}
         miss={miss}
         setMiss={setMiss}
+        missType={missType}
+        setMissType={setMissType}
         records={records}
         setRecords={setRecords}
         setPage={setPage}

@@ -9,14 +9,18 @@ function ClubMeasure({
   setDirection,
   miss,
   setMiss,
+  missType,
+  setMissType,
   records,
   setRecords,
   setPage,
 }) {
   const [hiddenRecords, setHiddenRecords] = useState(() => new Set());
   const [copyMessage, setCopyMessage] = useState("");
-  const clubs = ["DW", "FW", "UT", "7I", "PW"];
+  const clubs = ["DR", "FW", "UT", "7I", "PW"];
+  const missTypes = ["トップ", "ダフリ", "トゥシャンク", "ネックシャンク"];
   const directions = ["左", "まっすぐ", "右"];
+  const displayClub = (clubName) => (clubName === "DW" ? "DR" : clubName);
   const recentRecords = records
     .filter((record) => !hiddenRecords.has(record))
     .slice(0, 5);
@@ -42,11 +46,13 @@ function ClubMeasure({
         distance,
         direction: directionLabel,
         miss,
+        missType,
       },
       ...records,
     ]);
     setDistance("");
     setMiss("");
+    setMissType("");
     setCopyMessage("");
   };
 
@@ -57,14 +63,15 @@ function ClubMeasure({
 
   const copyRecentRecords = async () => {
     const text = [
-      "日時\tClub\t距離\t方向\tミス",
+      "日時\tClub\t距離\t方向\t左右ずれ幅\tミスの種類",
       ...recentRecords.map((record) =>
         [
           record.datetime,
-          record.club,
+          displayClub(record.club),
           record.distance,
           record.direction,
           record.miss,
+          record.missType ?? "",
         ].join("\t"),
       ),
     ].join("\n");
@@ -110,18 +117,6 @@ function ClubMeasure({
           />
         </label>
 
-        <label className="compactField numericField">
-          <span className="compactLabel">ミス量</span>
-          <input
-            className="inputBox"
-            type="number"
-            inputMode="numeric"
-            value={miss}
-            onChange={(e) => setMiss(e.target.value)}
-            aria-label="ミス量"
-          />
-        </label>
-
         <div className="compactField directionField">
           <span className="compactLabel">方向</span>
           <div className="directionButtons" role="group" aria-label="方向">
@@ -133,6 +128,34 @@ function ClubMeasure({
                 aria-label={value}
               >
                 {value === "左" ? "←" : value === "右" ? "→" : "●"}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <label className="compactField numericField">
+          <span className="compactLabel">左右ずれ幅</span>
+          <input
+            className="inputBox"
+            type="number"
+            inputMode="numeric"
+            value={miss}
+            onChange={(e) => setMiss(e.target.value)}
+            aria-label="左右ずれ幅"
+          />
+        </label>
+
+        <div className="compactField missTypeField">
+          <span className="compactLabel">ミスの種類</span>
+          <div className="missTypeButtons" role="group" aria-label="ミスの種類">
+            {missTypes.map((value) => (
+              <button
+                key={value}
+                className={`directionButton ${missType === value ? "active" : ""}`}
+                onClick={() => setMissType(missType === value ? "" : value)}
+                aria-pressed={missType === value}
+              >
+                {value}
               </button>
             ))}
           </div>
@@ -163,17 +186,19 @@ function ClubMeasure({
                 <th>Club</th>
                 <th>距離</th>
                 <th>方向</th>
-                <th>ミス</th>
+                <th>左右ずれ幅</th>
+                <th>ミスの種類</th>
               </tr>
             </thead>
             <tbody>
               {recentRecords.map((record, index) => (
                 <tr key={`${record.datetime}-${index}`}>
                   <td>{record.datetime}</td>
-                  <td>{record.club}</td>
+                  <td>{displayClub(record.club)}</td>
                   <td>{record.distance}</td>
                   <td>{record.direction}</td>
                   <td>{record.miss}</td>
+                  <td>{record.missType}</td>
                 </tr>
               ))}
             </tbody>

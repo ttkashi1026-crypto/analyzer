@@ -145,7 +145,7 @@ function RoundMeasure({
       </div>
 
       <div className="card">
-        <h3>🏌️ DW</h3>
+        <h3>🏌️ DR</h3>
 
         <Counter
           label="打数"
