@@ -18,9 +18,10 @@ function ClubMeasure({
   const [hiddenRecords, setHiddenRecords] = useState(() => new Set());
   const [copyMessage, setCopyMessage] = useState("");
   const clubs = ["DR", "FW", "UT", "7I", "PW"];
-  const missTypes = ["トップ", "ダフリ", "トゥシャンク", "ネックシャンク"];
+  const missTypes = ["トップ", "ダフリ", "トゥシャンク", "シャンク"];
   const directions = ["左", "まっすぐ", "右"];
   const displayClub = (clubName) => (clubName === "DW" ? "DR" : clubName);
+  const displayMissType = (type) => (type === "ネックシャンク" ? "シャンク" : type);
   const recentRecords = records
     .filter((record) => !hiddenRecords.has(record))
     .slice(0, 5);
@@ -71,7 +72,7 @@ function ClubMeasure({
           record.distance,
           record.direction,
           record.miss,
-          record.missType ?? "",
+          displayMissType(record.missType) ?? "",
         ].join("\t"),
       ),
     ].join("\n");
@@ -182,7 +183,6 @@ function ClubMeasure({
           <table>
             <thead>
               <tr>
-                <th>日時</th>
                 <th>Club</th>
                 <th>距離</th>
                 <th>方向</th>
@@ -193,12 +193,11 @@ function ClubMeasure({
             <tbody>
               {recentRecords.map((record, index) => (
                 <tr key={`${record.datetime}-${index}`}>
-                  <td>{record.datetime}</td>
                   <td>{displayClub(record.club)}</td>
                   <td>{record.distance}</td>
                   <td>{record.direction}</td>
                   <td>{record.miss}</td>
-                  <td>{record.missType}</td>
+                  <td>{displayMissType(record.missType)}</td>
                 </tr>
               ))}
             </tbody>

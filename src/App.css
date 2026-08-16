@@ -389,7 +389,6 @@ tr:nth-child(even) {
 
 .clubMeasure table {
   width: 100%;
-  min-width: 650px;
   table-layout: fixed;
   font-size: 13px;
 }
@@ -399,11 +398,11 @@ tr:nth-child(even) {
   padding: 5px 4px;
 }
 
-.clubMeasure th:first-child,
-.clubMeasure td:first-child {
-  width: 34%;
-  white-space: nowrap;
-}
+.clubMeasure th:nth-child(1) { width: 13%; }
+.clubMeasure th:nth-child(2) { width: 14%; }
+.clubMeasure th:nth-child(3) { width: 12%; }
+.clubMeasure th:nth-child(4) { width: 25%; }
+.clubMeasure th:nth-child(5) { width: 36%; }
 
 .clubMeasure .backButton {
   height: 40px;
@@ -447,8 +446,8 @@ tr:nth-child(even) {
     padding: 4px 2px;
   }
 
-  .clubMeasure th:first-child,
-  .clubMeasure td:first-child {
-    width: 37%;
+  .clubMeasure th,
+  .clubMeasure td {
+    overflow-wrap: anywhere;
   }
 }
