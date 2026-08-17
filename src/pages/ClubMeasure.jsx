@@ -1,4 +1,8 @@
 import { useState } from "react";
+import {
+  formatDeviation,
+  getDeviationColorClass,
+} from "../utils/clubRecordDisplay";
 
 function ClubMeasure({
   club,
@@ -71,7 +75,7 @@ function ClubMeasure({
           displayClub(record.club),
           record.distance,
           record.direction,
-          record.miss,
+          record.miss === "" || record.miss == null ? 0 : record.miss,
           displayMissType(record.missType) ?? "",
         ].join("\t"),
       ),
@@ -196,7 +200,9 @@ function ClubMeasure({
                   <td>{displayClub(record.club)}</td>
                   <td>{record.distance}</td>
                   <td>{record.direction}</td>
-                  <td>{record.miss}</td>
+                  <td className={getDeviationColorClass(record.miss)}>
+                    {formatDeviation(record.miss)}
+                  </td>
                   <td>{displayMissType(record.missType)}</td>
                 </tr>
               ))}

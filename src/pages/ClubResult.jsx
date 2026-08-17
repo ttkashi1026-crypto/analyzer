@@ -1,4 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  formatAverage,
+  formatDeviation,
+  getDeviationColorClass,
+  toFiniteNumber,
+} from "../utils/clubRecordDisplay";
 
 const toDateKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
@@ -36,6 +42,48 @@ function ClubResult({ records, setPage }) {
   const recordsForDate = records.filter((record) =>
     isRecordForDate(record, selectedDate),
   );
+  const clubSummaries = useMemo(() => {
+    const summaries = new Map();
+
+    recordsForDate.forEach((record) => {
+      const club = record.club === "DW" ? "DR" : record.club;
+      const summary = summaries.get(club) || {
+        club,
+        shotCount: 0,
+        distances: [],
+        deviations: [],
+        missCount: 0,
+      };
+      const distance = toFiniteNumber(record.distance);
+      const deviation = toFiniteNumber(record.miss);
+
+      summary.shotCount += 1;
+      if (distance !== null) summary.distances.push(distance);
+      summary.deviations.push(deviation ?? 0);
+      if (record.missType) summary.missCount += 1;
+      summaries.set(club, summary);
+    });
+
+    const average = (values) =>
+      values.length === 0
+        ? null
+        : values.reduce((total, value) => total + value, 0) / values.length;
+    const clubOrder = ["DR", "FW", "UT", "7I", "PW"];
+
+    return [...summaries.values()]
+      .map((summary) => ({
+        ...summary,
+        averageDistance: average(summary.distances),
+        averageDeviation: average(summary.deviations),
+        missRate: (summary.missCount / summary.shotCount) * 100,
+      }))
+      .sort((a, b) => {
+        const aIndex = clubOrder.indexOf(a.club);
+        const bIndex = clubOrder.indexOf(b.club);
+        return (aIndex === -1 ? clubOrder.length : aIndex) -
+          (bIndex === -1 ? clubOrder.length : bIndex);
+      });
+  }, [recordsForDate]);
   const selectedDateIndex = availableDates.indexOf(selectedDate);
 
   useEffect(() => {
@@ -86,30 +134,65 @@ function ClubResult({ records, setPage }) {
       {recordsForDate.length === 0 ? (
         <p>この日の計測記録はありません。</p>
       ) : (
-        <table style={{ fontSize: "14px" }}>
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>Club</th>
-              <th>Dist</th>
-              <th>Dir</th>
-              <th>左右ずれ幅</th>
-              <th>ミスの種類</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recordsForDate.map((record, index) => (
-              <tr key={`${record.datetime}-${index}`}>
-                <td>{record.datetime?.slice(-5)}</td>
-                <td>{record.club === "DW" ? "DR" : record.club}</td>
-                <td>{record.distance}</td>
-                <td>{record.direction}</td>
-                <td>{record.miss}</td>
-                <td>{record.missType}</td>
+        <>
+          <h2 className="resultSectionTitle">クラブ別集計</h2>
+          <table className="clubSummaryTable">
+            <thead>
+              <tr>
+                <th>Club</th>
+                <th>平均飛距離</th>
+                <th>平均ずれ幅</th>
+                <th>ミス率</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {clubSummaries.map((summary) => (
+                <tr key={summary.club}>
+                  <td>{summary.club}</td>
+                  <td>
+                    {formatAverage(summary.averageDistance)}
+                    {summary.averageDistance !== null && "y"}
+                  </td>
+                  <td className={getDeviationColorClass(summary.averageDeviation)}>
+                    {formatAverage(summary.averageDeviation)}
+                    {summary.averageDeviation !== null && "y"}
+                  </td>
+                  <td>{summary.missRate.toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <h2 className="resultSectionTitle">計測記録</h2>
+          <div className="tableWrap">
+            <table className="clubResultDetailTable">
+              <thead>
+                <tr>
+                  <th>時間</th>
+                  <th>Club</th>
+                  <th>Dist</th>
+                  <th>Dir</th>
+                  <th>左右ずれ幅</th>
+                  <th>ミスの種類</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recordsForDate.map((record, index) => (
+                  <tr key={`${record.datetime}-${index}`}>
+                    <td>{record.datetime?.slice(-5)}</td>
+                    <td>{record.club === "DW" ? "DR" : record.club}</td>
+                    <td>{record.distance}</td>
+                    <td>{record.direction}</td>
+                    <td className={getDeviationColorClass(record.miss)}>
+                      {formatDeviation(record.miss)}
+                    </td>
+                    <td>{record.missType}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       <button
