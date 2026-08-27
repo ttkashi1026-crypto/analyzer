@@ -30,6 +30,10 @@ function RoundMeasure({
   const [fwMiss, setFwMiss] = useState(() => initialValue("fwMiss"));
   const [fwPenalty, setFwPenalty] = useState(() => initialValue("fwPenalty"));
 
+  const [utShot, setUtShot] = useState(() => initialValue("utShot"));
+  const [utMiss, setUtMiss] = useState(() => initialValue("utMiss"));
+  const [utPenalty, setUtPenalty] = useState(() => initialValue("utPenalty"));
+
   const [ironShot, setIronShot] = useState(() => initialValue("ironShot"));
   const [ironMiss, setIronMiss] = useState(() => initialValue("ironMiss"));
   const [ironPenalty, setIronPenalty] = useState(() => initialValue("ironPenalty"));
@@ -43,11 +47,13 @@ function RoundMeasure({
   const score =
     dwShot +
     fwShot +
+    utShot +
     ironShot +
     approachShot +
     putt +
     dwPenalty +
     fwPenalty +
+    utPenalty +
     ironPenalty +
     approachPenalty;
 
@@ -167,7 +173,7 @@ function RoundMeasure({
       </div>
 
       <div className="card">
-        <h3>🏌️ FW / UT</h3>
+        <h3>🏌️ FW</h3>
 
         <Counter
           label="打数"
@@ -185,6 +191,17 @@ function RoundMeasure({
           label="ペナルティ"
           value={fwPenalty}
           setValue={setFwPenalty}
+        />
+      </div>
+      <div className="card">
+        <h3>🏌️ UT</h3>
+
+        <Counter label="打数" value={utShot} setValue={setUtShot} />
+        <Counter label="ミス" value={utMiss} setValue={setUtMiss} />
+        <Counter
+          label="ペナルティ"
+          value={utPenalty}
+          setValue={setUtPenalty}
         />
       </div>
             <div className="card">
@@ -282,6 +299,9 @@ function RoundMeasure({
             fwShot,
             fwMiss,
             fwPenalty,
+            utShot,
+            utMiss,
+            utPenalty,
             ironShot,
             ironMiss,
             ironPenalty,
@@ -320,6 +340,10 @@ function RoundMeasure({
           setFwShot(0);
           setFwMiss(0);
           setFwPenalty(0);
+
+          setUtShot(0);
+          setUtMiss(0);
+          setUtPenalty(0);
 
           setIronShot(0);
           setIronMiss(0);

@@ -62,6 +62,7 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
                   <th>SC</th>
                   <th>DR</th>
                   <th>FW</th>
+                  <th>UT</th>
                   <th>IR</th>
                   <th>AP</th>
                   <th>PT</th>
@@ -84,6 +85,7 @@ function RoundRecordsEdit({ roundRecords, setRoundRecords, setPage }) {
                     <td>{record.score}</td>
                     <td>{record.dwShot}</td>
                     <td>{record.fwShot}</td>
+                    <td>{record.utShot || 0}</td>
                     <td>{record.ironShot}</td>
                     <td>{record.approachShot}</td>
                     <td>{record.putt}</td>

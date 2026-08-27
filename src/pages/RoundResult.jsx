@@ -9,7 +9,8 @@ const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
 
 const clubDefinitions = [
   { label: "DR", shotKey: "dwShot", missKey: "dwMiss" },
-  { label: "FW / UT", shotKey: "fwShot", missKey: "fwMiss" },
+  { label: "FW", shotKey: "fwShot", missKey: "fwMiss" },
+  { label: "UT", shotKey: "utShot", missKey: "utMiss" },
   { label: "アイアン", shotKey: "ironShot", missKey: "ironMiss" },
   { label: "アプローチ", shotKey: "approachShot", missKey: "approachMiss" },
 ];
@@ -101,10 +102,11 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
         const penalty =
           record.dwPenalty +
           record.fwPenalty +
+          (Number(record.utPenalty) || 0) +
           record.ironPenalty +
           record.approachPenalty;
 
-        return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DR ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
+        return `${record.hole}H  PAR ${record.par}  SCORE ${record.score}  DR ${record.dwShot}(${record.dwMiss})  FW ${record.fwShot}(${record.fwMiss})  UT ${record.utShot || 0}(${record.utMiss || 0})  IR ${record.ironShot}(${record.ironMiss})  AP ${record.approachShot}(${record.approachMiss})  PT ${record.putt}  Pen ${penalty}`;
       }),
       `合計  PAR ${totalPar}  SCORE ${grossScore}  (${grossScore - totalPar >= 0 ? "+" : ""}${grossScore - totalPar})`,
     ].join("\n");
@@ -194,6 +196,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
               <th>SC</th>
               <th>DR</th>
               <th>FW</th>
+              <th>UT</th>
               <th>IR</th>
               <th>AP</th>
               <th>PT</th>
@@ -207,6 +210,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
               const penalty =
                 r.dwPenalty +
                 r.fwPenalty +
+                (Number(r.utPenalty) || 0) +
                 r.ironPenalty +
                 r.approachPenalty;
 
@@ -229,6 +233,11 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
                   <td>
                     {r.fwShot}
                     ({r.fwMiss})
+                  </td>
+
+                  <td>
+                    {r.utShot || 0}
+                    ({r.utMiss || 0})
                   </td>
 
                   <td>
