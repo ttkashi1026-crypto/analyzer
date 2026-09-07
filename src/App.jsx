@@ -127,6 +127,9 @@ function App() {
         selectedDate={selectedRoundResultDate}
         onSelectedDateChange={setSelectedRoundResultDate}
         onEditRecord={(index) => {
+          setSelectedRoundResultDate(
+            roundRecords[index]?.recordedOn || null,
+          );
           setEditingRoundIndex(index);
           setPage("round-measure");
         }}
