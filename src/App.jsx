@@ -138,7 +138,13 @@ function App() {
   }
 
   if (page === "maintenance-menu") {
-    return <MaintenanceMenu setPage={setPage} />;
+    return (
+      <MaintenanceMenu
+        records={records}
+        roundRecords={roundRecords}
+        setPage={setPage}
+      />
+    );
   }
 
   if (page === "round-records-edit") {
