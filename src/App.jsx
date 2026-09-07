@@ -17,6 +17,7 @@ import RoundRecordsEdit from "./pages/RoundRecordsEdit";
 function App() {
   const [page, setPage] = useState("home");
   const [editingRoundIndex, setEditingRoundIndex] = useState(null);
+  const [selectedRoundResultDate, setSelectedRoundResultDate] = useState(null);
 
   // クラブ計測入力
   const [club, setClub] = useState("DR");
@@ -123,6 +124,8 @@ function App() {
       <RoundResult
         roundRecords={roundRecords}
         setPage={setPage}
+        selectedDate={selectedRoundResultDate}
+        onSelectedDateChange={setSelectedRoundResultDate}
         onEditRecord={(index) => {
           setEditingRoundIndex(index);
           setPage("round-measure");

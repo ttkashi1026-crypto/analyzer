@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const toDateKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
@@ -35,7 +35,13 @@ const getClubStats = (records) =>
     };
   });
 
-function RoundResult({ roundRecords, setPage, onEditRecord }) {
+function RoundResult({
+  roundRecords,
+  setPage,
+  selectedDate,
+  onSelectedDateChange,
+  onEditRecord,
+}) {
   const [copyMessage, setCopyMessage] = useState("");
   const availableDates = useMemo(
     () => [
@@ -45,30 +51,35 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
     ].sort(),
     [roundRecords],
   );
-  const [selectedDate, setSelectedDate] = useState(
+  const [internalSelectedDate, setInternalSelectedDate] = useState(
     () => availableDates.at(-1) || toDateKey(),
   );
+  const currentSelectedDate = selectedDate ?? internalSelectedDate;
+  const setSelectedDate = useCallback((date) => {
+    setInternalSelectedDate(date);
+    onSelectedDateChange?.(date);
+  }, [onSelectedDateChange]);
   const recordsForDate = roundRecords.filter(
-    (record) => (record.recordedOn || toDateKey()) === selectedDate,
+    (record) => (record.recordedOn || toDateKey()) === currentSelectedDate,
   );
   const recordEntriesForDate = roundRecords
     .map((record, originalIndex) => ({ record, originalIndex }))
     .filter(
       ({ record }) =>
-        (record.recordedOn || toDateKey()) === selectedDate,
+        (record.recordedOn || toDateKey()) === currentSelectedDate,
     );
   const grossScore = recordsForDate.reduce(
     (total, record) => total + (Number(record.score) || 0),
     0,
   );
   const clubStats = getClubStats(recordsForDate);
-  const selectedDateIndex = availableDates.indexOf(selectedDate);
+  const selectedDateIndex = availableDates.indexOf(currentSelectedDate);
 
   useEffect(() => {
     if (availableDates.length > 0 && selectedDateIndex === -1) {
       setSelectedDate(availableDates.at(-1));
     }
-  }, [availableDates, selectedDateIndex]);
+  }, [availableDates, selectedDateIndex, setSelectedDate]);
 
   const changeDate = (offset) => {
     const nextDate = availableDates[selectedDateIndex + offset];
@@ -90,7 +101,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
 
     const resultText = [
       "ラウンド結果",
-      `記録日: ${formatDate(selectedDate)}`,
+      `記録日: ${formatDate(currentSelectedDate)}`,
       `コピー日時: ${copyDateTime}`,
       `グロススコア: ${grossScore}`,
       "クラブ別成功率",
@@ -142,7 +153,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
         >
           ←
         </button>
-        <strong>{formatDate(selectedDate)}</strong>
+        <strong>{formatDate(currentSelectedDate)}</strong>
         <button
           aria-label="次の記録日を表示"
           onClick={() => changeDate(1)}
@@ -216,7 +227,7 @@ function RoundResult({ roundRecords, setPage, onEditRecord }) {
 
               return (
                 <tr
-                  key={`${selectedDate}-${r.hole}-${originalIndex}`}
+                  key={`${currentSelectedDate}-${r.hole}-${originalIndex}`}
                   style={{
                     borderBottom: "1px solid #ddd",
                   }}
