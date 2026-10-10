@@ -153,7 +153,7 @@ function ClubResult({ records, setPage }) {
                     {formatAverage(summary.averageDistance)}
                     {summary.averageDistance !== null && "y"}
                   </td>
-                  <td className={getDeviationColorClass(summary.averageDeviation)}>
+                  <td className={getDeviationColorClass(summary.averageDeviation, summary.averageDistance)}>
                     {formatAverage(summary.averageDeviation)}
                     {summary.averageDeviation !== null && "y"}
                   </td>
@@ -183,7 +183,7 @@ function ClubResult({ records, setPage }) {
                     <td>{record.club === "DW" ? "DR" : record.club}</td>
                     <td>{record.distance}</td>
                     <td>{record.direction}</td>
-                    <td className={getDeviationColorClass(record.miss)}>
+                    <td className={getDeviationColorClass(record.miss, record.distance)}>
                       {formatDeviation(record.miss)}
                     </td>
                     <td>{record.missType}</td>

@@ -200,7 +200,7 @@ function ClubMeasure({
                   <td>{displayClub(record.club)}</td>
                   <td>{record.distance}</td>
                   <td>{record.direction}</td>
-                  <td className={getDeviationColorClass(record.miss)}>
+                  <td className={getDeviationColorClass(record.miss, record.distance)}>
                     {formatDeviation(record.miss)}
                   </td>
                   <td>{displayMissType(record.missType)}</td>

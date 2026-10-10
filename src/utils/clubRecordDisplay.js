@@ -1,12 +1,18 @@
-export const getDeviationColorClass = (value) => {
+export const getDeviationColorClass = (value, distance) => {
   if (value === "" || value === null || value === undefined) {
     return "deviationBlue";
   }
 
   const deviation = Number(value);
-  if (!Number.isFinite(deviation) || deviation <= 10) return "deviationBlue";
-  if (deviation <= 20) return "deviationBlack";
-  if (deviation <= 30) return "deviationOrange";
+  const shotDistance = toFiniteNumber(distance);
+  if (!Number.isFinite(deviation) || shotDistance === null || shotDistance <= 0) {
+    return "deviationBlue";
+  }
+
+  const ratio = (Math.abs(deviation) / shotDistance) * 100;
+  if (ratio <= 5) return "deviationBlue";
+  if (ratio <= 10) return "deviationBlack";
+  if (ratio <= 15) return "deviationOrange";
   return "deviationRed";
 };
 
