@@ -31,7 +31,7 @@ const isRecordForDate = (record, dateKey) => {
   return record.datetime?.startsWith(`${month}/${day}`);
 };
 
-function ClubResult({ records, setPage }) {
+function ClubResult({ records, setPage, onEditRecord }) {
   const availableDates = useMemo(
     () => [...new Set(records.map(getRecordDate).filter(Boolean))].sort(),
     [records],
@@ -174,11 +174,14 @@ function ClubResult({ records, setPage }) {
                   <th>Dir</th>
                   <th>左右ずれ幅</th>
                   <th>ミスの種類</th>
+                  <th>修正</th>
                 </tr>
               </thead>
               <tbody>
-                {recordsForDate.map((record, index) => (
-                  <tr key={`${record.datetime}-${index}`}>
+                {records.map((record, originalIndex) => ({ record, originalIndex }))
+                  .filter(({ record }) => isRecordForDate(record, selectedDate))
+                  .map(({ record, originalIndex }) => (
+                  <tr key={`${record.datetime}-${originalIndex}`}>
                     <td>{record.datetime?.slice(-5)}</td>
                     <td>{record.club === "DW" ? "DR" : record.club}</td>
                     <td>{record.distance}</td>
@@ -187,6 +190,15 @@ function ClubResult({ records, setPage }) {
                       {formatDeviation(record.miss)}
                     </td>
                     <td>{record.missType}</td>
+                    <td>
+                      <button
+                        className="roundEditButton"
+                        aria-label={`${record.datetime}の記録を修正`}
+                        onClick={() => onEditRecord(originalIndex)}
+                      >
+                        編集
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

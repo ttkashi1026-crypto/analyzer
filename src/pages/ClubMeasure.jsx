@@ -18,7 +18,10 @@ function ClubMeasure({
   records,
   setRecords,
   setPage,
+  editingIndex = null,
+  onFinishEditing,
 }) {
+  const editingRecord = editingIndex === null ? null : records[editingIndex];
   const [hiddenRecords, setHiddenRecords] = useState(() => new Set());
   const [copyMessage, setCopyMessage] = useState("");
   const clubs = ["DR", "FW", "UT", "7I", "PW"];
@@ -31,6 +34,21 @@ function ClubMeasure({
     .slice(0, 5);
 
   const saveRecord = () => {
+    if (editingRecord) {
+      const directionLabel = direction === "左" ? "←" : direction === "右" ? "→" : "●";
+      setRecords(records.map((record, index) => index === editingIndex ? {
+        ...record,
+        club,
+        distance,
+        direction: directionLabel,
+        miss,
+        missType,
+      } : record));
+      onFinishEditing?.();
+      setPage("club-result");
+      return;
+    }
+
     const now = new Date();
     const date = `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
       now.getDate(),
@@ -91,8 +109,8 @@ function ClubMeasure({
 
   return (
     <div className="container clubMeasure">
-      <div className="screenTitle">1-1. クラブ別計測</div>
-      <h1 className="title">クラブ計測</h1>
+      <div className="screenTitle">{editingRecord ? "1-1. クラブ別計測修正" : "1-1. クラブ別計測"}</div>
+      <h1 className="title">{editingRecord ? "計測記録の修正" : "クラブ計測"}</h1>
 
       <section className="clubSelector" aria-label="クラブ選択">
         <span className="compactLabel">クラブ</span>
@@ -167,11 +185,11 @@ function ClubMeasure({
         </div>
 
         <button className="menuButton saveButton" onClick={saveRecord}>
-          記録する
+          {editingRecord ? "変更を保存" : "記録する"}
         </button>
       </section>
 
-      <section className="recentRecords">
+      {!editingRecord && <section className="recentRecords">
         <div className="recentRecordsHeader">
           <h3>最新記録</h3>
           <button
@@ -217,10 +235,17 @@ function ClubMeasure({
           画面表示内容をコピー
         </button>
         {copyMessage && <span className="copyMessage">{copyMessage}</span>}
-      </section>
+      </section>}
 
-      <button className="backButton" onClick={() => setPage("club-menu")}>
-        戻る
+      <button className="backButton" onClick={() => {
+        if (editingRecord) {
+          onFinishEditing?.();
+          setPage("club-result");
+        } else {
+          setPage("club-menu");
+        }
+      }}>
+        {editingRecord ? "キャンセル" : "戻る"}
       </button>
     </div>
   );

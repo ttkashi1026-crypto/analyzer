@@ -1,4 +1,4 @@
-function RoundMenu({ setPage }) {
+function RoundMenu({ setPage, onStartRound }) {
   return (
     <div className="container">
       <div className="screenTitle">
@@ -9,9 +9,9 @@ function RoundMenu({ setPage }) {
 
       <button
         className="menuButton"
-        onClick={() => setPage("round-measure")}
+        onClick={onStartRound}
       >
-        ラウンド記録
+        新しいラウンドを記録
       </button>
 
       <button

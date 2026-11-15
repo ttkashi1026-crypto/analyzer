@@ -17,7 +17,10 @@ import RoundRecordsEdit from "./pages/RoundRecordsEdit";
 function App() {
   const [page, setPage] = useState("home");
   const [editingRoundIndex, setEditingRoundIndex] = useState(null);
+  const [activeRoundId, setActiveRoundId] = useState(null);
+  const [editingClubIndex, setEditingClubIndex] = useState(null);
   const [selectedRoundResultDate, setSelectedRoundResultDate] = useState(null);
+  const [selectedRoundResultId, setSelectedRoundResultId] = useState(null);
 
   // クラブ計測入力
   const [club, setClub] = useState("DR");
@@ -84,6 +87,8 @@ function App() {
         records={records}
         setRecords={setRecords}
         setPage={setPage}
+        editingIndex={editingClubIndex}
+        onFinishEditing={() => setEditingClubIndex(null)}
       />
     );
   }
@@ -93,6 +98,17 @@ function App() {
       <ClubResult
         records={records}
         setPage={setPage}
+        onEditRecord={(index) => {
+          const record = records[index];
+          if (!record) return;
+          setEditingClubIndex(index);
+          setClub(record.club === "DW" ? "DR" : record.club);
+          setDistance(record.distance ?? "");
+          setDirection(record.direction === "←" || record.direction === "左" ? "左" : record.direction === "→" || record.direction === "右" ? "右" : "まっすぐ");
+          setMiss(record.miss ?? "");
+          setMissType(record.missType === "ネックシャンク" ? "シャンク" : record.missType ?? "");
+          setPage("measure");
+        }}
       />
     );
   }
@@ -101,6 +117,15 @@ function App() {
   if (page === "round-menu") {
     return (
       <RoundMenu
+        onStartRound={() => {
+          const newRoundId = globalThis.crypto?.randomUUID?.() ||
+            `round-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          setActiveRoundId(newRoundId);
+          setSelectedRoundResultDate(null);
+          setSelectedRoundResultId(null);
+          setEditingRoundIndex(null);
+          setPage("round-measure");
+        }}
         setPage={setPage}
       />
     );
@@ -113,6 +138,7 @@ function App() {
         roundRecords={roundRecords}
         setRoundRecords={setRoundRecords}
         editingIndex={editingRoundIndex}
+        activeRoundId={activeRoundId}
         onFinishEditing={() => setEditingRoundIndex(null)}
       />
     );
@@ -126,10 +152,18 @@ function App() {
         setPage={setPage}
         selectedDate={selectedRoundResultDate}
         onSelectedDateChange={setSelectedRoundResultDate}
+        selectedRoundId={selectedRoundResultId}
+        onSelectedRoundChange={setSelectedRoundResultId}
         onEditRecord={(index) => {
+          const record = roundRecords[index];
           setSelectedRoundResultDate(
-            roundRecords[index]?.recordedOn || null,
+            record?.recordedOn || null,
           );
+          setSelectedRoundResultId(
+            record?.roundId ? `round:${record.roundId}` :
+              `legacy:${record?.recordedOn || "unknown"}`,
+          );
+          setActiveRoundId(record?.roundId || null);
           setEditingRoundIndex(index);
           setPage("round-measure");
         }}

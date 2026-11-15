@@ -12,6 +12,7 @@ function RoundMeasure({
   setRoundRecords,
   setPage,
   editingIndex = null,
+  activeRoundId = null,
   onFinishEditing,
 }) {
   const editingRecord =
@@ -290,6 +291,9 @@ function RoundMeasure({
         onClick={() => {
           const record = {
             recordedOn: editingRecord?.recordedOn || getDateKey(),
+            ...(editingRecord?.roundId || activeRoundId
+              ? { roundId: editingRecord?.roundId || activeRoundId }
+              : {}),
             hole,
             par,
             score,

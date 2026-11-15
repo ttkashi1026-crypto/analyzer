@@ -6,6 +6,7 @@ const toDateKey = (date = new Date()) =>
   ).padStart(2, "0")}`;
 
 const formatDate = (dateKey) => dateKey.replaceAll("-", "/");
+const EMPTY_ROUNDS = [];
 
 const clubDefinitions = [
   { label: "DR", shotKey: "dwShot", missKey: "dwMiss" },
@@ -40,16 +41,40 @@ function RoundResult({
   setPage,
   selectedDate,
   onSelectedDateChange,
+  selectedRoundId,
+  onSelectedRoundChange,
   onEditRecord,
 }) {
   const [copyMessage, setCopyMessage] = useState("");
+  const [internalSelectedRoundId, setInternalSelectedRoundId] = useState(null);
+  const roundGroupsByDate = useMemo(() => {
+    const groups = new Map();
+    roundRecords.forEach((record, originalIndex) => {
+      const date = record.recordedOn || toDateKey();
+      const groupId = record.roundId
+        ? `round:${record.roundId}`
+        : `legacy:${date}`;
+      const group = groups.get(groupId) || {
+        id: groupId,
+        date,
+        firstIndex: originalIndex,
+        recordEntries: [],
+      };
+      group.recordEntries.push({ record, originalIndex });
+      groups.set(groupId, group);
+    });
+    const byDate = new Map();
+    [...groups.values()].sort((a, b) => a.firstIndex - b.firstIndex)
+      .forEach((group) => {
+        const dateGroups = byDate.get(group.date) || [];
+        dateGroups.push({ ...group, roundNumber: dateGroups.length + 1 });
+        byDate.set(group.date, dateGroups);
+      });
+    return byDate;
+  }, [roundRecords]);
   const availableDates = useMemo(
-    () => [
-      ...new Set(
-        roundRecords.map((record) => record.recordedOn || toDateKey()),
-      ),
-    ].sort(),
-    [roundRecords],
+    () => [...roundGroupsByDate.keys()].sort(),
+    [roundGroupsByDate],
   );
   const [internalSelectedDate, setInternalSelectedDate] = useState(
     () => availableDates.at(-1) || toDateKey(),
@@ -59,21 +84,23 @@ function RoundResult({
     setInternalSelectedDate(date);
     onSelectedDateChange?.(date);
   }, [onSelectedDateChange]);
-  const recordsForDate = roundRecords.filter(
-    (record) => (record.recordedOn || toDateKey()) === currentSelectedDate,
-  );
-  const recordEntriesForDate = roundRecords
-    .map((record, originalIndex) => ({ record, originalIndex }))
-    .filter(
-      ({ record }) =>
-        (record.recordedOn || toDateKey()) === currentSelectedDate,
-    );
+  const roundsForDate = roundGroupsByDate.get(currentSelectedDate) || EMPTY_ROUNDS;
+  const currentSelectedRoundId = selectedRoundId ?? internalSelectedRoundId;
+  const selectedRound = roundsForDate.find((round) => round.id === currentSelectedRoundId);
+  const setSelectedRound = useCallback((roundId) => {
+    setInternalSelectedRoundId(roundId);
+    onSelectedRoundChange?.(roundId);
+    setCopyMessage("");
+  }, [onSelectedRoundChange]);
+  const recordsForDate = selectedRound?.recordEntries.map(({ record }) => record) || [];
+  const recordEntriesForDate = selectedRound?.recordEntries || [];
   const grossScore = recordsForDate.reduce(
     (total, record) => total + (Number(record.score) || 0),
     0,
   );
   const clubStats = getClubStats(recordsForDate);
   const selectedDateIndex = availableDates.indexOf(currentSelectedDate);
+  const selectedRoundIndex = roundsForDate.findIndex((round) => round.id === currentSelectedRoundId);
 
   useEffect(() => {
     if (availableDates.length > 0 && selectedDateIndex === -1) {
@@ -81,9 +108,19 @@ function RoundResult({
     }
   }, [availableDates, selectedDateIndex, setSelectedDate]);
 
+  useEffect(() => {
+    if (roundsForDate.length > 0 && selectedRoundIndex === -1) {
+      setSelectedRound(roundsForDate.at(-1).id);
+    }
+  }, [roundsForDate, selectedRoundIndex, currentSelectedDate, setSelectedRound]);
+
   const changeDate = (offset) => {
     const nextDate = availableDates[selectedDateIndex + offset];
-    if (nextDate) setSelectedDate(nextDate);
+    if (nextDate) {
+      setSelectedDate(nextDate);
+      const nextDateRounds = roundGroupsByDate.get(nextDate) || [];
+      setSelectedRound(nextDateRounds.at(-1)?.id || null);
+    }
     setCopyMessage("");
   };
 
@@ -102,6 +139,7 @@ function RoundResult({
     const resultText = [
       "ラウンド結果",
       `記録日: ${formatDate(currentSelectedDate)}`,
+      `ラウンド: ${selectedRound?.roundNumber || 1}ラウンド目`,
       `コピー日時: ${copyDateTime}`,
       `グロススコア: ${grossScore}`,
       "クラブ別成功率",
@@ -165,6 +203,21 @@ function RoundResult({
           →
         </button>
       </div>
+
+      {roundsForDate.length > 1 && (
+        <div className="roundChoice" role="group" aria-label="ラウンド選択">
+          {roundsForDate.map((round) => (
+            <button
+              key={round.id}
+              className={`roundChoiceButton ${round.id === currentSelectedRoundId ? "active" : ""}`}
+              aria-pressed={round.id === currentSelectedRoundId}
+              onClick={() => setSelectedRound(round.id)}
+            >
+              {round.roundNumber}ラウンド目
+            </button>
+          ))}
+        </div>
+      )}
 
       {recordsForDate.length === 0 ? (
         <p>ラウンドデータがありません。</p>
