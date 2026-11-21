@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const getDateKey = () => {
   const date = new Date();
@@ -13,12 +13,16 @@ function RoundMeasure({
   setPage,
   editingIndex = null,
   activeRoundId = null,
+  draft = null,
+  onDraftChange,
+  onFinishRound,
   onFinishEditing,
 }) {
   const editingRecord =
     editingIndex === null ? null : roundRecords[editingIndex];
+  const activeDraft = editingRecord ? null : draft;
   const initialValue = (key, fallback = 0) =>
-    Number(editingRecord?.[key] ?? fallback);
+    Number(editingRecord?.[key] ?? activeDraft?.[key] ?? fallback);
 
   const [hole, setHole] = useState(() => initialValue("hole", 1));
   const [par, setPar] = useState(() => initialValue("par", 4));
@@ -57,6 +61,56 @@ function RoundMeasure({
     utPenalty +
     ironPenalty +
     approachPenalty;
+
+  useEffect(() => {
+    if (!activeRoundId || editingRecord) return;
+    onDraftChange?.({
+      roundId: activeRoundId,
+      recordedOn: activeDraft?.recordedOn || getDateKey(),
+      hole,
+      par,
+      dwShot,
+      dwMiss,
+      dwPenalty,
+      fwShot,
+      fwMiss,
+      fwPenalty,
+      utShot,
+      utMiss,
+      utPenalty,
+      ironShot,
+      ironMiss,
+      ironPenalty,
+      approachShot,
+      approachMiss,
+      approachPenalty,
+      putt,
+      updatedAt: Date.now(),
+    });
+  }, [
+    activeRoundId,
+    editingRecord,
+    activeDraft?.recordedOn,
+    hole,
+    par,
+    dwShot,
+    dwMiss,
+    dwPenalty,
+    fwShot,
+    fwMiss,
+    fwPenalty,
+    utShot,
+    utMiss,
+    utPenalty,
+    ironShot,
+    ironMiss,
+    ironPenalty,
+    approachShot,
+    approachMiss,
+    approachPenalty,
+    putt,
+    onDraftChange,
+  ]);
 
   const Counter = ({ label, value, setValue }) => (
     <div
@@ -329,6 +383,7 @@ function RoundMeasure({
           setRoundRecords([...roundRecords, record]);
 
           if (hole >= 18) {
+            onFinishRound?.(activeRoundId);
             setPage("round-result");
             return;
           }

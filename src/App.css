@@ -300,6 +300,39 @@ tr:nth-child(even) {
   background: #2e7d32;
 }
 
+.unfinishedRounds {
+  margin: 8px 0 18px;
+}
+
+.unfinishedRounds h2 {
+  margin: 10px 0;
+  font-size: 20px;
+  text-align: left;
+}
+
+.unfinishedRoundCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 8px 0;
+  padding: 10px;
+  background: white;
+  border: 1px solid #d6e3d6;
+  border-radius: 10px;
+}
+
+.unfinishedRoundCard > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.unfinishedRoundCard span {
+  color: #555;
+  font-size: 13px;
+}
+
 .clubMeasure {
   max-width: 760px;
 }

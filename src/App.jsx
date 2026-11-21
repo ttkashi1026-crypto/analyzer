@@ -1,5 +1,5 @@
 import ErrorPage from "./pages/ErrorPage";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./App.css";
 
 import Home from "./pages/Home";
@@ -13,6 +13,35 @@ import RoundMeasure from "./pages/RoundMeasure";
 import RoundResult from "./pages/RoundResult";
 import MaintenanceMenu from "./pages/MaintenanceMenu";
 import RoundRecordsEdit from "./pages/RoundRecordsEdit";
+
+const getDateKey = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
+
+const createRoundDraft = (roundId) => ({
+  roundId,
+  recordedOn: getDateKey(),
+  hole: 1,
+  par: 4,
+  dwShot: 0,
+  dwMiss: 0,
+  dwPenalty: 0,
+  fwShot: 0,
+  fwMiss: 0,
+  fwPenalty: 0,
+  utShot: 0,
+  utMiss: 0,
+  utPenalty: 0,
+  ironShot: 0,
+  ironMiss: 0,
+  ironPenalty: 0,
+  approachShot: 0,
+  approachMiss: 0,
+  approachPenalty: 0,
+  putt: 0,
+  updatedAt: Date.now(),
+});
 
 function App() {
   const [page, setPage] = useState("home");
@@ -48,12 +77,55 @@ function App() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [roundDrafts, setRoundDrafts] = useState(() => {
+    const savedDrafts = localStorage.getItem("roundDrafts");
+    if (savedDrafts) return JSON.parse(savedDrafts);
+
+    const legacyRounds = new Map();
+    roundRecords.forEach((record) => {
+      if (!record.roundId) return;
+      const round = legacyRounds.get(record.roundId) || {
+        recordedOn: record.recordedOn || getDateKey(),
+        holes: [],
+      };
+      round.holes.push(Number(record.hole) || 0);
+      legacyRounds.set(record.roundId, round);
+    });
+
+    return [...legacyRounds.entries()]
+      .map(([roundId, round]) => {
+        const savedHoles = [...new Set(round.holes)].filter((hole) => hole > 0);
+        const nextHole = Math.max(0, ...savedHoles) + 1;
+        return savedHoles.length > 0 && nextHole <= 18
+          ? { ...createRoundDraft(roundId), recordedOn: round.recordedOn, hole: nextHole }
+          : null;
+      })
+      .filter(Boolean);
+  });
+
   useEffect(() => {
     localStorage.setItem(
       "roundRecords",
       JSON.stringify(roundRecords),
     );
   }, [roundRecords]);
+
+  useEffect(() => {
+    localStorage.setItem("roundDrafts", JSON.stringify(roundDrafts));
+  }, [roundDrafts]);
+
+  const updateRoundDraft = useCallback((draft) => {
+    setRoundDrafts((current) => {
+      const exists = current.some((item) => item.roundId === draft.roundId);
+      return exists
+        ? current.map((item) => item.roundId === draft.roundId ? draft : item)
+        : [...current, draft];
+    });
+  }, []);
+
+  const finishRoundDraft = useCallback((roundId) => {
+    setRoundDrafts((current) => current.filter((draft) => draft.roundId !== roundId));
+  }, []);
 
   // 9. エラー
   if (page === "error") {
@@ -121,8 +193,16 @@ function App() {
           const newRoundId = globalThis.crypto?.randomUUID?.() ||
             `round-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
           setActiveRoundId(newRoundId);
+          updateRoundDraft(createRoundDraft(newRoundId));
           setSelectedRoundResultDate(null);
           setSelectedRoundResultId(null);
+          setEditingRoundIndex(null);
+          setPage("round-measure");
+        }}
+        roundDrafts={roundDrafts}
+        roundRecords={roundRecords}
+        onResumeRound={(draft) => {
+          setActiveRoundId(draft.roundId);
           setEditingRoundIndex(null);
           setPage("round-measure");
         }}
@@ -139,6 +219,9 @@ function App() {
         setRoundRecords={setRoundRecords}
         editingIndex={editingRoundIndex}
         activeRoundId={activeRoundId}
+        draft={roundDrafts.find((item) => item.roundId === activeRoundId) || null}
+        onDraftChange={updateRoundDraft}
+        onFinishRound={finishRoundDraft}
         onFinishEditing={() => setEditingRoundIndex(null)}
       />
     );
