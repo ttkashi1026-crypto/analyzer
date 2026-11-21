@@ -32,6 +32,7 @@ function ClubMeasure({
   const recentRecords = records
     .filter((record) => !hiddenRecords.has(record))
     .slice(0, 5);
+  const displayedRecords = [...recentRecords].reverse();
 
   const saveRecord = () => {
     if (editingRecord) {
@@ -87,7 +88,7 @@ function ClubMeasure({
   const copyRecentRecords = async () => {
     const text = [
       "日時\tClub\t距離\t方向\t左右ずれ幅\tミスの種類",
-      ...recentRecords.map((record) =>
+      ...displayedRecords.map((record) =>
         [
           record.datetime,
           displayClub(record.club),
@@ -213,7 +214,7 @@ function ClubMeasure({
               </tr>
             </thead>
             <tbody>
-              {recentRecords.map((record, index) => (
+              {displayedRecords.map((record, index) => (
                 <tr key={`${record.datetime}-${index}`}>
                   <td>{displayClub(record.club)}</td>
                   <td>{record.distance}</td>
